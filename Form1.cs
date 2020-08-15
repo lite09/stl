@@ -1,8 +1,10 @@
-﻿using System;
+﻿using CsvHelper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,6 +44,15 @@ namespace stl
                     foreach (string[] it in l)
                         if (title[i] == "\"" + it[0] + "\"")
                             title[i] = it[1];
+
+                using (var reader = new StreamReader(file_option, Encoding.GetEncoding(1251)))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    csv.Configuration.Delimiter = ";";
+
+                    var l = csv.GetRecords<option_csv>();
+                    options_csv = l.ToList();
+                }
             }
         }
     }
