@@ -40,7 +40,7 @@ namespace stl
 
                 for (int i = 0; i < title.Length; i++)
                     foreach (string[] it in l)
-                        if (title[i] == it[0])
+                        if (title[i] == "\"" + it[0] + "\"")
                             title[i] = it[1];
             }
         }
