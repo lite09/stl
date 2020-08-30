@@ -33,6 +33,8 @@ namespace stl
 
             foreach (string file_option in files_opions)
             {
+                List<Options> ptions = new List<Options>();
+                string name_f = Path.GetFileNameWithoutExtension(file_option) + ".csv";
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
                 string normal_file = "";
                 Regex get_line = new Regex("(.*)\r\n");
@@ -74,25 +76,30 @@ namespace stl
                 {
                     normal_file += line;
                 }
-                File.WriteAllText("time.txt", normal_file);
+                File.WriteAllText(name_f, normal_file, Encoding.GetEncoding(1251));
 
-                using (var reader = new StreamReader(file_option, Encoding.GetEncoding(1251)))
+                using (var reader = new StreamReader(name_f, Encoding.GetEncoding(1251)))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
                     csv.Configuration.Delimiter = ";";
                     //csv.Configuration.RegisterClassMap<Options>();
                     csv.Configuration.HeaderValidated = null;
                     csv.Configuration.MissingFieldFound = null;
-                    csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
+                    //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
 
                     var li = csv.GetRecords<Options>();
 
-                    
-                    foreach (Options item in li)
-                    {
-                        var itm = item;
-                    }
-                    //var ptions = li.ToList();
+
+                    //foreach (Options item in li)
+                    //{
+                    //    var itm = item;
+                    //}
+                    ptions = li.ToList();
+                }
+                using (var writer = new StreamWriter("test.csv"))
+                using (var csv = new CsvWriter(writer))
+                {
+                    csv.WriteRecords(ptions);
                 }
             }
         }
