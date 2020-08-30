@@ -34,24 +34,65 @@ namespace stl
             foreach (string file_option in files_opions)
             {
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
+                string normal_file = "";
                 Regex get_line = new Regex("(.*)\r\n");
-                Match words = get_line.Match(fileText);
+                string words = get_line.Match(fileText).Groups[1].Value;
                 Regex sub_string = new Regex(";");
                 
-                string []title = sub_string.Split(words.Value);
+                string []title = sub_string.Split(words);
+                List <string> unload = new List<string>();
 
                 for (int i = 0; i < title.Length; i++)
+                {
+                    bool fine = false;
                     foreach (string[] it in l)
                         if (title[i] == "\"" + it[0] + "\"")
-                            title[i] = it[1];
+                        {
+                            title[i] = it[1]; fine = true;
+                        }
+                        
+                    if (!fine) 
+                        unload.Add(title[i]);
+                }
+
+                string save = "";
+
+                foreach (string s in unload)
+                {
+                    save += s + "\r\n";
+                }
+
+                File.WriteAllText("unload.txt", save);
+
+                foreach (var item in title)
+                    normal_file += item + ";";
+
+                normal_file += "\r\n";
+
+                MatchCollection lines = get_line.Matches(fileText);
+                foreach (Match line in lines)
+                {
+                    normal_file += line;
+                }
+                File.WriteAllText("time.txt", normal_file);
 
                 using (var reader = new StreamReader(file_option, Encoding.GetEncoding(1251)))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
                     csv.Configuration.Delimiter = ";";
+                    //csv.Configuration.RegisterClassMap<Options>();
+                    csv.Configuration.HeaderValidated = null;
+                    csv.Configuration.MissingFieldFound = null;
+                    csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
 
-                    var l = csv.GetRecords<option_csv>();
-                    options_csv = l.ToList();
+                    var li = csv.GetRecords<Options>();
+
+                    
+                    foreach (Options item in li)
+                    {
+                        var itm = item;
+                    }
+                    //var ptions = li.ToList();
                 }
             }
         }
