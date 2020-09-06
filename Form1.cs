@@ -42,7 +42,7 @@ namespace stl
                 //normal_file = "";
                 name_f += "_hi_" + Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
-                Regex get_line = new Regex("(.*)\r\n");
+                Regex get_line = new Regex("(.*)\r\n", RegexOptions.Multiline);
                 string words = get_line.Match(fileText).Groups[1].Value;
                 Regex sub_string = new Regex(";");
 
@@ -52,7 +52,7 @@ namespace stl
                 {
                     bool fine = false;
                     foreach (string[] it in l)
-                        if (title[il] == "\"" + it[0] + "\"")
+                        if (title[il] == /*"\"" + */it[0] /*+ "\""*/)
                         {
                             title[il] = it[1]; fine = true;
                         }
@@ -99,6 +99,9 @@ namespace stl
                 csv.Configuration.Delimiter = ";";
                 csv.Configuration.HeaderValidated = null;
                 csv.Configuration.MissingFieldFound = null;
+                csv.Configuration.Encoding = Encoding.GetEncoding(1251);
+                //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
+                //csv.Configuration.RegisterClassMap<map>();
 
                 var li = csv.GetRecords<Options>();
                 ptions = li.ToList();
@@ -106,16 +109,17 @@ namespace stl
 
             foreach (string tl in title_tmp)
             {
-                //
-
-
+                foreach (Options item in ptions)
+                {
+                    string hi = nameof(item);
+                }
             }
+
             //using (var writer = new StreamWriter("test.csv"))
-            //using (var csv = new CsvWriter(writer))
+            //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
             //{
             //    csv.WriteRecords(ptions);
             //}
-
 
         }
     }
