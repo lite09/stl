@@ -32,6 +32,10 @@ namespace stl
             string[] files_opions = Directory.GetFiles("sl");
             string normal_file = "";
             string name_f = "";
+            string save_uload = "";
+            List<string> title_tmp = new List<string>();
+            int i_tittle = 0;
+            List<string> unload = new List<string>();
 
             foreach (string file_option in files_opions)
             {
@@ -43,7 +47,6 @@ namespace stl
                 Regex sub_string = new Regex(";");
 
                 string[] title = sub_string.Split(words);
-                List<string> unload = new List<string>();
 
                 for (int il = 0; il < title.Length; il++)
                 {
@@ -58,14 +61,14 @@ namespace stl
                         unload.Add(title[il]);
                 }
 
-                string save = "";
+                if (i_tittle == 0)
+                    foreach (string str in title) title_tmp.Add (str);
+
 
                 foreach (string s in unload)
                 {
-                    save += s + "\r\n";
+                    save_uload += s + "\r\n";
                 }
-
-                if (save != "") File.WriteAllText("unload.txt", save);
 
                 foreach (var item in title)
                     normal_file += item + ";";
@@ -79,8 +82,12 @@ namespace stl
                     if (i == 0) { i++; continue; }
                     normal_file += line;
                 }
+            }
 
-
+            if (save_uload != "")
+            {
+                File.WriteAllText("unload.txt", save_uload);
+                MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
             }
 
             File.WriteAllText(name_f + ".csv", normal_file, Encoding.GetEncoding(1251));
@@ -90,19 +97,18 @@ namespace stl
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 csv.Configuration.Delimiter = ";";
-                //csv.Configuration.RegisterClassMap<Options>();
                 csv.Configuration.HeaderValidated = null;
                 csv.Configuration.MissingFieldFound = null;
-                //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
 
                 var li = csv.GetRecords<Options>();
-
-
-                //foreach (Options item in li)
-                //{
-                //    var itm = item;
-                //}
                 ptions = li.ToList();
+            }
+
+            foreach (string tl in title_tmp)
+            {
+                //
+
+
             }
             //using (var writer = new StreamWriter("test.csv"))
             //using (var csv = new CsvWriter(writer))
