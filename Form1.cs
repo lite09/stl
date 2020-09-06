@@ -30,31 +30,32 @@ namespace stl
             //string filename = ;
             var l = sets.add_options(openFileDialog.FileName);
             string[] files_opions = Directory.GetFiles("sl");
+            string normal_file = "";
+            string name_f = "";
 
             foreach (string file_option in files_opions)
             {
-                List<Options> ptions = new List<Options>();
-                string name_f = Path.GetFileNameWithoutExtension(file_option) + ".csv";
+                //normal_file = "";
+                name_f += "_hi_" + Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
-                string normal_file = "";
                 Regex get_line = new Regex("(.*)\r\n");
                 string words = get_line.Match(fileText).Groups[1].Value;
                 Regex sub_string = new Regex(";");
-                
-                string []title = sub_string.Split(words);
-                List <string> unload = new List<string>();
 
-                for (int i = 0; i < title.Length; i++)
+                string[] title = sub_string.Split(words);
+                List<string> unload = new List<string>();
+
+                for (int il = 0; il < title.Length; il++)
                 {
                     bool fine = false;
                     foreach (string[] it in l)
-                        if (title[i] == "\"" + it[0] + "\"")
+                        if (title[il] == "\"" + it[0] + "\"")
                         {
-                            title[i] = it[1]; fine = true;
+                            title[il] = it[1]; fine = true;
                         }
-                        
-                    if (!fine) 
-                        unload.Add(title[i]);
+
+                    if (!fine)
+                        unload.Add(title[il]);
                 }
 
                 string save = "";
@@ -64,7 +65,7 @@ namespace stl
                     save += s + "\r\n";
                 }
 
-                File.WriteAllText("unload.txt", save);
+                if (save != "") File.WriteAllText("unload.txt", save);
 
                 foreach (var item in title)
                     normal_file += item + ";";
@@ -72,36 +73,44 @@ namespace stl
                 normal_file += "\r\n";
 
                 MatchCollection lines = get_line.Matches(fileText);
+                int i = 0;
                 foreach (Match line in lines)
                 {
+                    if (i == 0) { i++; continue; }
                     normal_file += line;
                 }
-                File.WriteAllText(name_f, normal_file, Encoding.GetEncoding(1251));
-
-                using (var reader = new StreamReader(name_f, Encoding.GetEncoding(1251)))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                {
-                    csv.Configuration.Delimiter = ";";
-                    //csv.Configuration.RegisterClassMap<Options>();
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.MissingFieldFound = null;
-                    //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
-
-                    var li = csv.GetRecords<Options>();
 
 
-                    //foreach (Options item in li)
-                    //{
-                    //    var itm = item;
-                    //}
-                    ptions = li.ToList();
-                }
-                using (var writer = new StreamWriter("test.csv"))
-                using (var csv = new CsvWriter(writer))
-                {
-                    csv.WriteRecords(ptions);
-                }
             }
+
+            File.WriteAllText(name_f + ".csv", normal_file, Encoding.GetEncoding(1251));
+
+            List<Options> ptions = new List<Options>();
+            using (var reader = new StreamReader(name_f + ".csv", Encoding.GetEncoding(1251)))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                csv.Configuration.Delimiter = ";";
+                //csv.Configuration.RegisterClassMap<Options>();
+                csv.Configuration.HeaderValidated = null;
+                csv.Configuration.MissingFieldFound = null;
+                //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
+
+                var li = csv.GetRecords<Options>();
+
+
+                //foreach (Options item in li)
+                //{
+                //    var itm = item;
+                //}
+                ptions = li.ToList();
+            }
+            //using (var writer = new StreamWriter("test.csv"))
+            //using (var csv = new CsvWriter(writer))
+            //{
+            //    csv.WriteRecords(ptions);
+            //}
+
+
         }
     }
 }
