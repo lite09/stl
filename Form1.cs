@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -61,9 +62,9 @@ namespace stl
                         unload.Add(title[il]);
                 }
 
-                if (i_tittle == 0)
-                    foreach (string str in title) title_tmp.Add (str);
-
+                if (i_tittle == 0) {
+                    foreach (string str in title) title_tmp.Add(str); i_tittle++;
+                }
 
                 foreach (string s in unload)
                 {
@@ -92,7 +93,7 @@ namespace stl
 
             File.WriteAllText(name_f + ".csv", normal_file, Encoding.GetEncoding(1251));
 
-            List<Options> ptions = new List<Options>();
+            List<Options> options_values = new List<Options>();
             using (var reader = new StreamReader(name_f + ".csv", Encoding.GetEncoding(1251)))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
@@ -104,16 +105,20 @@ namespace stl
                 //csv.Configuration.RegisterClassMap<map>();
 
                 var li = csv.GetRecords<Options>();
-                ptions = li.ToList();
+                options_values = li.ToList();
             }
 
-            foreach (string tl in title_tmp)
-            {
-                foreach (Options item in ptions)
+                foreach (Options option in options_values)
                 {
-                    string hi = nameof(item);
+                    foreach (string tl in title_tmp)
+                    {
+                    //Type t = typeof(Options);
+                    //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
+                    //var str = fld.GetValue(option);
+                        string val = option.get_property(tl.ToLower(), option);
+                    }
+                    string hi = nameof(option);
                 }
-            }
 
             //using (var writer = new StreamWriter("test.csv"))
             //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
