@@ -37,15 +37,17 @@ namespace stl
             List<string> title_tmp = new List<string>();
             int i_tittle = 0;
             List<string> unload = new List<string>();
+            Regex get_line = new Regex("(.*)\r\n", RegexOptions.Multiline);
+            string words = "";
+            StringBuilder sb = new StringBuilder();
 
             foreach (string file_option in files_opions)
             {
                 //normal_file = "";
                 name_f += "_hi_" + Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
-                Regex get_line = new Regex("(.*)\r\n", RegexOptions.Multiline);
-                string words = get_line.Match(fileText).Groups[1].Value;
                 Regex sub_string = new Regex(";");
+                words = get_line.Match(fileText).Groups[1].Value;
 
                 string[] title = sub_string.Split(words);
 
@@ -53,7 +55,7 @@ namespace stl
                 {
                     bool fine = false;
                     foreach (string[] it in l)
-                        if (title[il] == /*"\"" + */it[0] /*+ "\""*/)
+                        if (title[il] == "\"" + it[0] + "\"")
                         {
                             title[il] = it[1]; fine = true;
                         }
@@ -62,7 +64,8 @@ namespace stl
                         unload.Add(title[il]);
                 }
 
-                if (i_tittle == 0) {
+                if (i_tittle == 0)
+                {
                     foreach (string str in title) title_tmp.Add(str); i_tittle++;
                 }
 
@@ -83,42 +86,55 @@ namespace stl
                     if (i == 0) { i++; continue; }
                     normal_file += line;
                 }
-            }
+                //}
 
-            if (save_uload != "")
-            {
-                File.WriteAllText("unload.txt", save_uload);
-                MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
-            }
+                if (save_uload != "")
+                {
+                    File.WriteAllText("unload.txt", save_uload);
+                    MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
+                }
 
-            File.WriteAllText(name_f + ".csv", normal_file, Encoding.GetEncoding(1251));
+                File.WriteAllText(name_f + ".csv", normal_file, Encoding.GetEncoding(1251));
 
-            List<Options> options_values = new List<Options>();
-            using (var reader = new StreamReader(name_f + ".csv", Encoding.GetEncoding(1251)))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csv.Configuration.Delimiter = ";";
-                csv.Configuration.HeaderValidated = null;
-                csv.Configuration.MissingFieldFound = null;
-                csv.Configuration.Encoding = Encoding.GetEncoding(1251);
-                //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
-                //csv.Configuration.RegisterClassMap<map>();
+                List<Options> options_values = new List<Options>();
+                using (var reader = new StreamReader(name_f + ".csv", Encoding.GetEncoding(1251)))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    csv.Configuration.Delimiter = ";";
+                    csv.Configuration.HeaderValidated = null;
+                    csv.Configuration.MissingFieldFound = null;
+                    csv.Configuration.Encoding = Encoding.GetEncoding(1251);
+                    //csv.Configuration.MemberTypes = CsvHelper.Configuration.MemberTypes.Fields;
+                    //csv.Configuration.RegisterClassMap<map>();
 
-                var li = csv.GetRecords<Options>();
-                options_values = li.ToList();
-            }
+                    var li = csv.GetRecords<Options>();
+                    options_values = li.ToList();
+                }
+
+                foreach (string option in title_tmp) sb.Append(option + ";"); sb.Append("\r\n");
+
 
                 foreach (Options option in options_values)
                 {
                     foreach (string tl in title_tmp)
                     {
-                    //Type t = typeof(Options);
-                    //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
-                    //var str = fld.GetValue(option);
-                        string val = option.get_property(tl.ToLower(), option);
+                        //Type t = typeof(Options);
+                        //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
+                        //var str = fld.GetValue(option);
+                        if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_")
+                        {
+                            words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
+                            sb.Append(words + ";");
+                        }
+                        else
+                            sb.Append(option.get_property(tl.ToLower(), option) + ";");
                     }
-                    string hi = nameof(option);
+                    sb.Append("\r\n");
+                    //string hi = nameof(option);
                 }
+            }
+
+            File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
 
             //using (var writer = new StreamWriter("test.csv"))
             //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
