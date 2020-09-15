@@ -29,8 +29,9 @@ namespace stl
                 return;
 
             //string filename = ;
-            var l = sets.add_options(openFileDialog.FileName);
-            string[] files_opions = Directory.GetFiles("sl");
+            List<Options> options = new List<Options>();        // опции всех файлов
+            var l = sets.add_options(openFileDialog.FileName);  // путь к папке с файлами
+            string[] files_opions = Directory.GetFiles("sl");   // список файлов
             string normal_file = "";
             string name_f = "";
             string save_uload = "";
@@ -44,7 +45,7 @@ namespace stl
             foreach (string file_option in files_opions)
             {
                 //normal_file = "";
-                name_f += "_hi_" + Path.GetFileNameWithoutExtension(file_option);
+                name_f += Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
                 Regex sub_string = new Regex(";");
                 words = get_line.Match(fileText).Groups[1].Value;
@@ -57,16 +58,12 @@ namespace stl
                     foreach (string[] it in l)
                         if (title[il] == "\"" + it[0] + "\"")
                         {
-                            title[il] = it[1]; fine = true;
+                            fine = true;
+                            title_tmp.Add(it[1]);   // заголовок из наденных свойств
                         }
 
                     if (!fine)
-                        unload.Add(title[il]);
-                }
-
-                if (i_tittle == 0)
-                {
-                    foreach (string str in title) title_tmp.Add(str); i_tittle++;
+                        unload.Add(title[il]);      // не найденные свойства
                 }
 
                 foreach (string s in unload)
@@ -74,10 +71,10 @@ namespace stl
                     save_uload += s + "\r\n";
                 }
 
-                foreach (var item in title)
+                foreach (var item in title_tmp)
                     normal_file += item + ";";
 
-                normal_file += "\r\n";
+                normal_file += "\r\n";  // файл с правильным заголовком
 
                 MatchCollection lines = get_line.Matches(fileText);
                 int i = 0;
