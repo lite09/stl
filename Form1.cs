@@ -1,15 +1,11 @@
 ﻿using CsvHelper;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace stl
@@ -52,7 +48,7 @@ namespace stl
                 {
                     bool fine = false;
                     foreach (string[] it in l)
-                        if (title[il] == /*"\"" + */it[0] /*+ "\""*/)
+                        if (title[il] == "\"" + it[0] + "\"")
                         {
                             title[il] = it[1]; fine = true;
                         }
@@ -111,7 +107,7 @@ namespace stl
             {
                 foreach (Options item in ptions)
                 {
-                    string hi = nameof(item);
+                    string hi = nameof(item.ID);
                 }
             }
 
