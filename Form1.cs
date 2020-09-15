@@ -35,49 +35,64 @@ namespace stl
             string name_f = "";
             string save_uload = "";
             List<string> title_tmp = new List<string>();
+            List<string> title = new List<string>();
             List<string> unload = new List<string>();
             Regex get_line = new Regex("(.*)\r\n", RegexOptions.Multiline);
             string words = "";
             StringBuilder sb = new StringBuilder();
-            bool head_files_options = false;
 
             foreach (string file_option in files_opions)
             {
                 string normal_file = "";
+                title_tmp.Clear();
                 //normal_file = "";
                 name_f = Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
 
                 // -------------------------------------------- Заголовок --------------------------------------------
                 Regex sub_string = new Regex(";");
-                if (!head_files_options)
+
+                words = get_line.Match(fileText).Groups[1].Value;
+
+                string[] title_l = sub_string.Split(words);
+
+                for (int il = 0; il < title_l.Length; il++)
                 {
-                    words = get_line.Match(fileText).Groups[1].Value;
+                    bool fine = false;
+                    foreach (string[] it in l)
+                        if (title_l[il] == "\"" + it[0] + "\"")
+                        {
+                            fine = true;
+                            title_tmp.Add(it[1]);   // заголовок из наденных свойств
+                        }
 
-                    string[] title = sub_string.Split(words);
-
-                    for (int il = 0; il < title.Length; il++)
-                    {
-                        bool fine = false;
-                        foreach (string[] it in l)
-                            if (title[il] == "\"" + it[0] + "\"")
-                            {
-                                fine = true;
-                                title_tmp.Add(it[1]);   // заголовок из наденных свойств
-                            }
-
-                        if (!fine)
-                            unload.Add(title[il]);      // не найденные свойства
-                    }
-
-                    foreach (string s in unload)
-                    {
-                        save_uload += s + "\r\n";
-                    }
-
-                    foreach (string option in title_tmp) sb.Append(option + ";"); sb.Append("\r\n");
-                    head_files_options = true;
+                    if (!fine)
+                        unload.Add(title_l[il]);      // не найденные свойства
                 }
+
+                foreach (string s in unload)
+                {
+                    save_uload += s + "\r\n";
+                }
+
+
+                foreach (string option in title_tmp)
+                {
+                    bool is_tl = false;
+                    foreach (string tl in title)
+                    {
+                        if (option == tl)
+                        {
+                            is_tl = true;
+                            break;
+                        }
+                    }
+                    if (!is_tl)
+                        title.Add(option);
+                }
+                //sb.Append(option + ";");
+                
+                //sb.Append("\r\n");
                 // -------------------------------------------- Заголовок --------------------------------------------
 
 
@@ -118,12 +133,20 @@ namespace stl
                     options_values = li.ToList();
                     options.AddRange(options_values);
                 }
+
+                //using (var writer = new StreamWriter("file.csv"/*, Encoding.GetEncoding(1251)*/))
+                //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
+                //{
+                //    csv.WriteRecords(options);
+                //}
             }
 
+            foreach (var tl in title) sb.Append(tl + ";");
+            sb.Append("\r\n");
 
             foreach (Options option in options)
             {
-                foreach (string tl in title_tmp)
+                foreach (string tl in title)
                 {
                     //Type t = typeof(Options);
                     //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
@@ -144,7 +167,6 @@ namespace stl
                 sb.Append("\r\n");
                 //string hi = nameof(option);
             }
-
             File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
 
             //using (var writer = new StreamWriter("test.csv"))
