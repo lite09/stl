@@ -792,7 +792,11 @@ public class Options
             if (i == null)
                 return "";
 
-            return i.GetValue(op).ToString();
+            object value = i.GetValue(op);//.ToString();
+            if (value == null)
+                return "";
+
+            return value.ToString();
         }
         catch   { return ""; }
     }

@@ -32,44 +32,54 @@ namespace stl
             List<Options> options = new List<Options>();        // опции всех файлов
             var l = sets.add_options(openFileDialog.FileName);  // путь к папке с файлами
             string[] files_opions = Directory.GetFiles("sl");   // список файлов
-            string normal_file = "";
             string name_f = "";
             string save_uload = "";
             List<string> title_tmp = new List<string>();
-            int i_tittle = 0;
             List<string> unload = new List<string>();
             Regex get_line = new Regex("(.*)\r\n", RegexOptions.Multiline);
             string words = "";
             StringBuilder sb = new StringBuilder();
+            bool head_files_options = false;
 
             foreach (string file_option in files_opions)
             {
+                string normal_file = "";
                 //normal_file = "";
-                name_f += Path.GetFileNameWithoutExtension(file_option);
+                name_f = Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
+
+                // -------------------------------------------- Заголовок --------------------------------------------
                 Regex sub_string = new Regex(";");
-                words = get_line.Match(fileText).Groups[1].Value;
-
-                string[] title = sub_string.Split(words);
-
-                for (int il = 0; il < title.Length; il++)
+                if (!head_files_options)
                 {
-                    bool fine = false;
-                    foreach (string[] it in l)
-                        if (title[il] == "\"" + it[0] + "\"")
-                        {
-                            fine = true;
-                            title_tmp.Add(it[1]);   // заголовок из наденных свойств
-                        }
+                    words = get_line.Match(fileText).Groups[1].Value;
 
-                    if (!fine)
-                        unload.Add(title[il]);      // не найденные свойства
-                }
+                    string[] title = sub_string.Split(words);
 
-                foreach (string s in unload)
-                {
-                    save_uload += s + "\r\n";
+                    for (int il = 0; il < title.Length; il++)
+                    {
+                        bool fine = false;
+                        foreach (string[] it in l)
+                            if (title[il] == "\"" + it[0] + "\"")
+                            {
+                                fine = true;
+                                title_tmp.Add(it[1]);   // заголовок из наденных свойств
+                            }
+
+                        if (!fine)
+                            unload.Add(title[il]);      // не найденные свойства
+                    }
+
+                    foreach (string s in unload)
+                    {
+                        save_uload += s + "\r\n";
+                    }
+
+                    foreach (string option in title_tmp) sb.Append(option + ";"); sb.Append("\r\n");
+                    head_files_options = true;
                 }
+                // -------------------------------------------- Заголовок --------------------------------------------
+
 
                 foreach (var item in title_tmp)
                     normal_file += item + ";";
@@ -106,29 +116,33 @@ namespace stl
 
                     var li = csv.GetRecords<Options>();
                     options_values = li.ToList();
+                    options.AddRange(options_values);
                 }
+            }
 
-                foreach (string option in title_tmp) sb.Append(option + ";"); sb.Append("\r\n");
 
-
-                foreach (Options option in options_values)
+            foreach (Options option in options)
+            {
+                foreach (string tl in title_tmp)
                 {
-                    foreach (string tl in title_tmp)
+                    //Type t = typeof(Options);
+                    //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
+                    //var str = fld.GetValue(option);
+                    if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_")
                     {
-                        //Type t = typeof(Options);
-                        //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
-                        //var str = fld.GetValue(option);
-                        if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_")
-                        {
-                            words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
-                            sb.Append(words + ";");
-                        }
-                        else
-                            sb.Append(option.get_property(tl.ToLower(), option) + ";");
+                        words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
+                        sb.Append(words + ";");
                     }
-                    sb.Append("\r\n");
-                    //string hi = nameof(option);
+                    else
+                    {
+                        string id = option.get_property(tl.ToLower(), option);
+                        if (id == "ID")
+                            MessageBox.Show("hi");
+                        sb.Append(option.get_property(tl.ToLower(), option) + ";");
+                    }
                 }
+                sb.Append("\r\n");
+                //string hi = nameof(option);
             }
 
             File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
