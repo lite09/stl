@@ -50,6 +50,10 @@ public class Options
     public string VID_GRAVYURY{ get { return vid_gravyury; } set { vid_gravyury = value; } }
     public string vid_dekora;
     public string VID_DEKORA{ get { return vid_dekora; } set { vid_dekora = value; } }
+
+    public string vid_deleniya;
+    public string VID_DELENIYA { get { return vid_deleniya; } set { vid_deleniya = value; } }
+
     public string vid_dereva;
     public string VID_DEREVA{ get { return vid_dereva; } set { vid_dereva = value; } }
     public string vid_dyrokola;
@@ -127,7 +131,9 @@ public class Options
     public string vid_straz;
     public string VID_STRAZ{ get { return vid_straz; } set { vid_straz = value; } }
     public string vid_ustanovki;
-    public string VID_USTANOVKI{ get { return vid_ustanovki; } set { vid_ustanovki = value; } }
+    public string VID_UPAKOVKI { get { return vid_upakovki; } set { vid_upakovki = value; } }
+    public string vid_upakovki;
+    public string VID_USTANOVKI { get { return vid_ustanovki; } set { vid_ustanovki = value; } }
     public string vid_ustrojstva;
     public string VID_USTROJSTVA{ get { return vid_ustrojstva; } set { vid_ustrojstva = value; } }
     public string vid_freski;
@@ -302,8 +308,15 @@ public class Options
     public string KOLICHESTVO_LISTOV { get { return kolichestvo_listov; } set { kolichestvo_listov = value; } }
     public string kolichestvo_nitej;
     public string KOLICHESTVO_NITEJ { get { return kolichestvo_nitej; } set { kolichestvo_nitej = value; } }
+
+    public string kolichestvo_otverstij;
+    public string KOLICHESTVO_OTVERSTIJ { get { return kolichestvo_otverstij; } set { kolichestvo_otverstij = value; } }
+
     public string kolichestvo_otdelenij;
     public string KOLICHESTVO_OTDELENIJ { get { return kolichestvo_otdelenij; } set { kolichestvo_otdelenij = value; } }
+
+    public string kolichestvo_probivaemyh_listov;
+    public string KOLICHESTVO_PROBIVAEMYH_LISTOV { get { return kolichestvo_probivaemyh_listov; } set { kolichestvo_probivaemyh_listov = value; } }
     public string kolichestvo_rezhimov;
     public string KOLICHESTVO_REZHIMOV { get { return kolichestvo_rezhimov; } set { kolichestvo_rezhimov = value; } }
     public string kolichestvo_rozhkov;
@@ -434,6 +447,10 @@ public class Options
     public string OBLAST_PRIM{ get { return oblast_prim; } set { oblast_prim = value; } }
     public string obem_l;
     public string OBEM_L { get { return obem_l; } set { obem_l = value; } }
+
+    public string ogranichitelnaya_linejka;
+    public string OGRANICHITELNAYA_LINEJKA { get { return ogranichitelnaya_linejka; } set { ogranichitelnaya_linejka = value; } }
+
     public string volume_ml;
     public string VOLUME_ML { get { return volume_ml; } set { volume_ml = value; } }
     public string overlok;
@@ -755,6 +772,8 @@ public class Options
     public string SHKOLNYJ_PREDMET { get { return shkolnyj_predmet; } set { shkolnyj_predmet = value; } }
     public string elektromontazhnyj_instrument;
     public string ELEKTROMONTAZHNYJ_INSTRUMENT { get { return elektromontazhnyj_instrument; } set { elektromontazhnyj_instrument = value; } }
+    public string effekt;
+    public string EFFEKT { get { return effekt; } set { effekt = value; } }
     public string effekty;
     public string EFFEKTY { get { return effekty; } set { effekty = value; } }
     public string id;                           public string ID { get { return id; } set { id = value; } }
@@ -772,6 +791,8 @@ public class Options
     public string SIZE { get { return size; } set { size = value; } }
     public string ves_brutto;
     public string VES_BRUTTO { get { return ves_brutto; } set { ves_brutto = value; } }
+    public string ves_netto_g;
+    public string VES_NETTO_G { get { return ves_netto_g; } set { ves_netto_g = value; } }
     public string price_for_the_one;
     public string PRICE_FOR_THE_ONE { get { return price_for_the_one; } set { price_for_the_one = value; } }
     public string price_for;

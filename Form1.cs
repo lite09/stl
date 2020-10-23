@@ -1,16 +1,11 @@
 ﻿using CsvHelper;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace stl
@@ -24,13 +19,16 @@ namespace stl
 
         private void таблицаСвойствToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
             settings sets = new settings();
-            if (openFileDialog.ShowDialog() == DialogResult.Cancel)
-                return;
 
             //string filename = ;
             List<Options> options = new List<Options>();        // опции всех файлов
-            var l = sets.add_options(openFileDialog.FileName);  // путь к папке с файлами
+            var l = sets.add_options("cfg//Таблица свойств.csv");  // путь к папке с файлами
             string[] files_opions = Directory.GetFiles("sl");   // список файлов
             string name_f = "";
             string save_uload = "";
@@ -91,7 +89,7 @@ namespace stl
                         title.Add(option);
                 }
                 //sb.Append(option + ";");
-                
+
                 //sb.Append("\r\n");
                 // -------------------------------------------- Заголовок --------------------------------------------
 
@@ -144,6 +142,7 @@ namespace stl
             foreach (var tl in title) sb.Append(tl + ";");
             sb.Append("\r\n");
 
+            // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
             foreach (Options option in options)
             {
                 foreach (string tl in title)
@@ -151,30 +150,31 @@ namespace stl
                     //Type t = typeof(Options);
                     //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
                     //var str = fld.GetValue(option);
-                    if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_")
+                    if (tl == "EFFEKT" && option.EFFEKT != "")
+                    {
+                        //
+                    }
+
+                    // ------------------------------------------- игнорирование дубля ------------------------------------------- 
+                    if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
                     {
                         words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
                         sb.Append(words + ";");
                     }
+                    // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     else
                     {
                         string id = option.get_property(tl.ToLower(), option);
-                        if (id == "ID")
-                            MessageBox.Show("hi");
                         sb.Append(option.get_property(tl.ToLower(), option) + ";");
                     }
                 }
                 sb.Append("\r\n");
                 //string hi = nameof(option);
             }
+            foreach (string file_option in files_opions)
+                File.Delete(Path.GetFileName(file_option));
             File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
-
-            //using (var writer = new StreamWriter("test.csv"))
-            //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
-            //{
-            //    csv.WriteRecords(ptions);
-            //}
-
+            // --------------------------- выборка из массива классов свойств в string bufer для созранения в текстовый файл --------------------------- 
         }
     }
 }
