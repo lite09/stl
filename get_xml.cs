@@ -11,8 +11,8 @@ using System.Xml.Linq;
 public class Get_xml
 {
     StringReader file_xml_data;
-    IEnumerable<xml_offer> ienum_xml = null;
-    List<xml_offer> get_xml_data = new List<xml_offer>();
+    IEnumerable<Xml_offer> ienum_xml = null;
+    public List<Xml_offer> get_xml_data = new List<Xml_offer>();
 
     public Get_xml(string xml, List<int> index)
 	{
@@ -21,7 +21,7 @@ public class Get_xml
         get_xml_data = ienum_xml.ToList();
     }
 
-    IEnumerable<xml_offer> offer(StringReader string_xml, List <int> index)
+    IEnumerable<Xml_offer> offer(StringReader string_xml, List <int> index)
     {
 
         XmlReaderSettings settings = new XmlReaderSettings();
@@ -39,18 +39,24 @@ public class Get_xml
                     case XmlNodeType.Element:
                         if (reader.Name == "offer")
                         {
-                            xml_offer offer = new xml_offer();
+                            Xml_offer offer = new Xml_offer();
                             XElement el = XNode.ReadFrom(reader) as XElement;
                             // float a, b, c;
 
                             IEnumerable<XElement> i;
-                            offer.id = offer.id_with_prefix = el.Attribute("id").Value;
+                            offer.id = el.Attribute("id").Value;
+                            bool find = false;
                             foreach (int id in index)
                             {
                                 if (Convert.ToInt32(offer.id) != id) continue;
-                                else if (Convert.ToInt32(offer.id) == id) index.RemoveAll(l => l == Convert.ToInt32(offer.id));
-                                else goto next_loop;
+                                else { 
+                                    index.RemoveAll(l => l == Convert.ToInt32(offer.id));
+                                    find = true;
+                                    break;
+                                }
                             }
+
+                            if (!find) goto next_loop;
 
                             offer.name = el.Element("name").Value; offer.name = offer.name.Replace(";", " ");
                             offer.price = offer.price_time = Convert.ToSingle(el.Element("price").Value, CultureInfo.InvariantCulture);
@@ -74,7 +80,7 @@ public class Get_xml
 }
 
 
-class xml_offer
+public class Xml_offer
 {
     List<string> prepositions = new List<string> {
         "A"/*латиница*/, "А"

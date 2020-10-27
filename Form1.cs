@@ -148,17 +148,18 @@ namespace stl
 
             // получение данных из хмл файла учитывая только индексы которые есть в списке options
             Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
-            // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
-            foreach (Options option in options)
+            foreach (Xml_offer line_data in xml_data.get_xml_data)
+            {
+                //
+            }
+                // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
+                foreach (Options option in options)
             {
 
                 foreach (string tl in title)
                 {
 
-                    if (tl == "DESCRIPTION" /*&& option.EFFEKT != ""*/)
-                    {
-                        //
-                    }
+                    if (tl == "DESCRIPTION" /*&& option.EFFEKT != ""*/) {}
 
                     // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
