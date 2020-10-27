@@ -176,6 +176,11 @@ namespace stl
             File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
             // --------------------------- выборка из массива классов свойств в string bufer для созранения в текстовый файл --------------------------- 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
