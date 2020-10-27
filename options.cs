@@ -4,7 +4,8 @@ using System.Reflection;
 public class Options
 {
 
-
+    public string proizvoditel = "hi";
+    public string description = "l";
 
     public string max_oboroty_ob_min;
     public string MAX_OBOROTY_OB_MIN{ get { return max_oboroty_ob_min; } set { max_oboroty_ob_min = value; } }

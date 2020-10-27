@@ -27,9 +27,10 @@ namespace stl
             settings sets = new settings();
 
             //string filename = ;
-            List<Options> options = new List<Options>();        // опции всех файлов
-            var l = sets.add_options("cfg//Таблица свойств.csv");  // путь к папке с файлами
-            string[] files_opions = Directory.GetFiles("sl");   // список файлов
+            List<Options> options = new List<Options>();            // опции всех файлов
+            List<int> index = new List<int>();                      // список индексов из данных парсера
+            var l = sets.add_options("cfg//Таблица свойств.csv");   // путь к папке с файлами
+            string[] files_opions = Directory.GetFiles("sl");       // список файлов
             string name_f = "";
             string save_uload = "";
             List<string> title_tmp = new List<string>();
@@ -73,10 +74,10 @@ namespace stl
                     save_uload += s + "\r\n";
                 }
 
-
+                int i = 0;
                 foreach (string option in title_tmp)
                 {
-                    bool is_tl = false;
+                    bool is_tl = false; i++;
                     foreach (string tl in title)
                     {
                         if (option == tl)
@@ -87,6 +88,7 @@ namespace stl
                     }
                     if (!is_tl)
                         title.Add(option);
+                    if (i == 5) { title.Add("proizvoditel"); title.Add("DESCRIPTION"); }
                 }
                 //sb.Append(option + ";");
 
@@ -100,7 +102,7 @@ namespace stl
                 normal_file += "\r\n";  // файл с правильным заголовком
 
                 MatchCollection lines = get_line.Matches(fileText);
-                int i = 0;
+                i = 0;
                 foreach (Match line in lines)
                 {
                     if (i == 0) { i++; continue; }
@@ -131,26 +133,29 @@ namespace stl
                     options_values = li.ToList();
                     options.AddRange(options_values);
                 }
-
-                //using (var writer = new StreamWriter("file.csv"/*, Encoding.GetEncoding(1251)*/))
-                //using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
-                //{
-                //    csv.WriteRecords(options);
-                //}
             }
 
             foreach (var tl in title) sb.Append(tl + ";");
             sb.Append("\r\n");
 
+            // --------------------------- добавление в список индексов ---------------------------
+            foreach (Options option in options)
+            {
+                try { index.Add(Convert.ToInt32(option.artnumber)); }
+                catch {}
+            }
+            // --------------------------- добавление в список индексов ---------------------------
+
+            // получение данных из хмл файла учитывая только индексы которые есть в списке options
+            Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
             // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
             foreach (Options option in options)
             {
+
                 foreach (string tl in title)
                 {
-                    //Type t = typeof(Options);
-                    //var fld = typeof(Options).GetField(tl.ToLower()).GetValue(option);
-                    //var str = fld.GetValue(option);
-                    if (tl == "EFFEKT" && option.EFFEKT != "")
+
+                    if (tl == "DESCRIPTION" /*&& option.EFFEKT != ""*/)
                     {
                         //
                     }
@@ -171,16 +176,18 @@ namespace stl
                 sb.Append("\r\n");
                 //string hi = nameof(option);
             }
+
+            // удаляем временные файлы
             foreach (string file_option in files_opions)
                 File.Delete(Path.GetFileName(file_option));
+            // сохраняем говый файл
             File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
             // --------------------------- выборка из массива классов свойств в string bufer для созранения в текстовый файл --------------------------- 
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //string file_xml_data = File.ReadAllText("xml\\kanctovary.xml");
-            Get_xml xml_data = new Get_xml("xml\\kanctovary.xml");
+            //Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
         }
     }
 }

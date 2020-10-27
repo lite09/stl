@@ -14,14 +14,14 @@ public class Get_xml
     IEnumerable<xml_offer> ienum_xml = null;
     List<xml_offer> get_xml_data = new List<xml_offer>();
 
-    public Get_xml(string xml)
+    public Get_xml(string xml, List<int> index)
 	{
         file_xml_data = new StringReader(File.ReadAllText(xml));
-        ienum_xml = offer(file_xml_data);
+        ienum_xml = offer(file_xml_data, index);
         get_xml_data = ienum_xml.ToList();
     }
 
-    IEnumerable<xml_offer> offer(StringReader string_xml)
+    IEnumerable<xml_offer> offer(StringReader string_xml, List <int> index)
     {
 
         XmlReaderSettings settings = new XmlReaderSettings();
@@ -45,6 +45,13 @@ public class Get_xml
 
                             IEnumerable<XElement> i;
                             offer.id = offer.id_with_prefix = el.Attribute("id").Value;
+                            foreach (int id in index)
+                            {
+                                if (Convert.ToInt32(offer.id) != id) continue;
+                                else if (Convert.ToInt32(offer.id) == id) index.RemoveAll(l => l == Convert.ToInt32(offer.id));
+                                else goto next_loop;
+                            }
+
                             offer.name = el.Element("name").Value; offer.name = offer.name.Replace(";", " ");
                             offer.price = offer.price_time = Convert.ToSingle(el.Element("price").Value, CultureInfo.InvariantCulture);
                             try { offer.vendor = el.Element("vendor").Value; } catch { offer.vendor = ""; }
@@ -60,6 +67,7 @@ public class Get_xml
 
                     break;
                 }
+            next_loop:;
             }
         }
     }
@@ -79,31 +87,9 @@ class xml_offer
     };
 
     public string id, id_with_prefix;
-    public int delivery_days, min_quantity;
-    public float price, price_time, price_new, weight_new, a, b, c, a_new, b_new, c_new;
+    public float price, price_time;
 
-    public string available, categoryId, name, short_name, vendor, description, sales_notes,
-        composition,                    // cостав
-        product_color,
-        size,
-        gred,
-        packing_size,
-        //individual_packing,             // индивидуальная упаковка
-        //certificate,
-        weight,                         // вес
-        in_stock,                       // на складе
-        type_of_package,                // Тип упаковки, DELIVERY_PACKAGE_TYPE
-        composition_of_package;         // Состав упаковки, DELIVERY_PACKAGE
-    public List<string> pictures;
-
-    public List<string> pictures_to_str(IEnumerable<XElement> pics)
-    {
-        List<string> pics_st = new List<string>();
-        foreach (XElement el in pics) pics_st.Add((string)el);
-
-        return pics_st;
-    }
-
+    public string name, short_name, vendor, sales_notes, composition; // cостав
 
     // создание короткого имени
     public string name_short(string name)
