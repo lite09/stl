@@ -179,7 +179,8 @@ namespace stl
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            //string file_xml_data = File.ReadAllText("xml\\kanctovary.xml");
+            Get_xml xml_data = new Get_xml("xml\\kanctovary.xml");
         }
     }
 }

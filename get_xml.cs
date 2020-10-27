@@ -8,11 +8,18 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 
-public class get_xml
+public class Get_xml
 {
-    public get_xml()
+    StringReader file_xml_data;
+    IEnumerable<xml_offer> ienum_xml = null;
+    List<xml_offer> get_xml_data = new List<xml_offer>();
+
+    public Get_xml(string xml)
 	{
-	}
+        file_xml_data = new StringReader(File.ReadAllText(xml));
+        ienum_xml = offer(file_xml_data);
+        get_xml_data = ienum_xml.ToList();
+    }
 
     IEnumerable<xml_offer> offer(StringReader string_xml)
     {
