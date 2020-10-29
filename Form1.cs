@@ -24,12 +24,10 @@ namespace stl
 
         private void button1_Click(object sender, EventArgs e)
         {
-            settings sets = new settings();
-
-            //string filename = ;
+            settings sets = new settings("cfg\\Таблица свойств.csv", "cfg\\Соотнесение категорий.csv", "cfg\\id категории.csv", "cfg\\Формирование розничных цен.csv");
+            //var l = sets.get_coefficient(9);
             List<Options> options = new List<Options>();            // опции всех файлов
             List<int> index = new List<int>();                      // список индексов из данных парсера
-            var l = sets.add_options("cfg//Таблица свойств.csv");   // путь к папке с файлами
             string[] files_opions = Directory.GetFiles("sl");       // список файлов
             string name_f = "";
             string save_uload = "";
@@ -58,7 +56,7 @@ namespace stl
                 for (int il = 0; il < title_l.Length; il++)
                 {
                     bool fine = false;
-                    foreach (string[] it in l)
+                    foreach (string[] it in sets.options)
                         if (title_l[il] == "\"" + it[0] + "\"")
                         {
                             fine = true;
@@ -224,19 +222,47 @@ namespace stl
 
 public partial class settings
 {
-    List<string[]> options;
-    public List<string> prepositions = new List<string>     { "A"/*латиница*/, "А" };                                           // список предлогов для обрывки фразы
-    public List<string> stop_words = new List<string>       { "d\\s*=", "h\\s*=", "r\\s*=", "А\\.", "№", "SchE",  "ш\\." };     // список стоп слов для обрывки фразы
-    public List<float[]> coefficient = new List<float[]>    {};                                                                 // список коэффициентов
-    List<string[]> mod_catalog = new List<string[]>();                                                                          // список категорий
+    public List<string[]> options       = new List<string[]>();
+    public List<string> prepositions    = new List<string>          { "A"/*латиница*/, "А" };                                           // список предлогов для обрывки фразы
+    public List<string> stop_words      = new List<string>          { "d\\s*=", "h\\s*=", "r\\s*=", "А\\.", "№", "SchE",  "ш\\." };     // список стоп слов для обрывки фразы
+    public List<float[]> coefficients   = new List<float[]>{};                                                                          // список коэффициентов
+    List<string[]> categoryes           = new List<string[]>();                                                                         // список категорий
+    List<string[]> name_of_categoryes   = new List<string[]>();                                                                         // список соотношений имени и кода категорий
 
     public settings()
     {
-        options = new List<string[]>();
+        get_stop_words();
+    }
+    public settings(string file_options)
+    {
+        add_options(file_options);
+        get_stop_words();
+
+    }
+    public settings(string file_options, string file_categoryes)
+    {
+        add_options(file_options);
+        get_category(file_categoryes);
+        get_stop_words();
+    }
+    public settings(string file_options, string categoryes, string file_coefficients)
+    {
+        add_options(file_options);
+        get_category(categoryes);
+        get_coefficients(file_coefficients);
         get_stop_words();
     }
 
-    public List<string[]> add_options(string file_name)
+    public settings(string file_options, string categoryes, string file_get_name_of_category, string file_coefficients)
+    {
+        add_options(file_options);
+        get_category(categoryes);
+        get_name_of_category(file_get_name_of_category);
+        get_coefficients(file_coefficients);
+        get_stop_words();
+    }
+
+    private void add_options(string file_name)
     {
         string fileText = System.IO.File.ReadAllText(file_name, Encoding.Default);
 
@@ -259,11 +285,10 @@ public partial class settings
                 options.Add(ops);
             }
         }
-
-        return options;
     }
+
     // загрузка слов для обрезания фразы и предлоги
-    public void get_stop_words()
+    private void get_stop_words()
     {
         string stop_wrd = File.ReadAllText("cfg\\stop words.csv", Encoding.Default);
         //richTextBox1.Text = stop_wrd;
@@ -290,5 +315,82 @@ public partial class settings
             if (line[0] != "") prepositions.Add(line[0]);
             if (line[1] != "") stop_words.Add(line[1]);
         }
+    }
+    private void get_category(string file_category) {
+        string catalogs = File.ReadAllText(file_category, Encoding.Default);
+
+        Regex get_line = new Regex("(.*)\r\n");
+        MatchCollection words = get_line.Matches(catalogs);
+        Regex sub_string = new Regex(";");
+        string[] line;
+
+        foreach (Match m in words)
+        {
+            line = sub_string.Split(m.Groups[1].Value);
+            string[] cats = new string[2];
+            if (line[0] != "")
+            {
+                cats[0] = line[0];
+                cats[1] = line[1];
+            }
+            if (line[0] != "") categoryes.Add(cats);
+        }
+        categoryes.RemoveAt(0);
+    }
+    private void get_name_of_category(string file_name_of_category) {
+        string catalogs = File.ReadAllText(file_name_of_category, Encoding.Default);
+
+        Regex get_line = new Regex("(.*)\r\n");
+        MatchCollection words = get_line.Matches(catalogs);
+        Regex sub_string = new Regex(";");
+        string[] line;
+
+        foreach (Match m in words)
+        {
+            line = sub_string.Split(m.Groups[1].Value);
+            string[] cats = new string[2];
+            if (line[0] != "")
+            {
+                cats[0] = line[0];
+                cats[1] = line[1];
+            }
+            if (line[0] != "") name_of_categoryes.Add(cats);
+        }
+        name_of_categoryes.RemoveAt(0);
+    }
+    private void get_coefficients(string file_coefficient)
+    {
+        string catalogs = File.ReadAllText(file_coefficient, Encoding.Default);
+
+        Regex get_line = new Regex("(.*)\r\n");
+        MatchCollection words = get_line.Matches(catalogs);
+        Regex sub_string = new Regex(";");
+        string[] line;
+
+        foreach (Match m in words)
+        {
+            line = sub_string.Split(m.Groups[1].Value);
+            float[] coefficient = new float[3];
+            if (line[0] != "")
+            {
+                coefficient[0] = Convert.ToSingle(line[0]);
+                coefficient[1] = Convert.ToSingle(line[1]);
+                coefficient[2] = Convert.ToSingle(line[2], CultureInfo.InvariantCulture);
+            }
+            if (line[0] != "") coefficients.Add(coefficient);
+        }
+    }
+    public float get_coefficient(int price)
+    {
+        foreach (float[] range in coefficients)
+            if ((price >= range[0]) && (price <= range[1]))
+                return range[2];
+
+        MessageBox.Show("Коэффициент не был найден");
+        return 2;
+    }
+    public string get_name_of_category(int category_xml)
+    {
+        return "category";
     }
 }
