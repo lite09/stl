@@ -64,8 +64,7 @@ public class Get_xml
                             try { offer.vendor = el.Element("vendor").Value; } catch { offer.vendor = ""; }
                             i = el.Elements("param").Where(e => (string)e.Attribute("name") == "Состав");
                             offer.composition = (string)i.FirstOrDefault();
-
-
+                            try { offer.category = Convert.ToInt32(el.Element("categoryId").Value); } catch { offer.category = 9999999; MessageBox.Show("нет категории"); }
 
 
                             if (el != null)
@@ -82,6 +81,7 @@ public class Get_xml
 
 public class Xml_offer
 {
+    public int category;
     public string id, id_with_prefix;
     public float price, price_time;
     public string name, short_name, vendor, sales_notes, composition; // cостав

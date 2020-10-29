@@ -26,6 +26,7 @@ namespace stl
         {
             settings sets = new settings("cfg\\Таблица свойств.csv", "cfg\\Соотнесение категорий.csv", "cfg\\id категории.csv", "cfg\\Формирование розничных цен.csv");
             //var l = sets.get_coefficient(9);
+            var cat = sets.get_name_of_category(22941);
             List<Options> options = new List<Options>();            // опции всех файлов
             List<int> index = new List<int>();                      // список индексов из данных парсера
             string[] files_opions = Directory.GetFiles("sl");       // список файлов
@@ -156,14 +157,6 @@ namespace stl
             // получение данных из хмл файла учитывая только индексы которые есть в списке options
             Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
 
-            //foreach (Options option in options)
-            //{
-            //    option.proizvoditel = xml_data.get_xml_data.Find(data => data.id == option.artnumber).vendor;
-            //}
-            //foreach (Xml_offer line_data in xml_data.get_xml_data)
-            //{
-            //    //
-            //}
             // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
             foreach (Options option in options)
             {
@@ -175,9 +168,11 @@ namespace stl
                 string short_name = time_xml_line.name_short(time_xml_line.name, sets.prepositions, sets.stop_words);
                 string proisvoditel = option.proizvoditel;
                 string strana_prois = option.strana_proizvoditel;
+                string price = Convert.ToString(time_xml_line.price * sets.get_coefficient(time_xml_line.price));
                 string artnum = option.artnumber;
                 string material = option.material;
                 string features = option.features;
+                string category = sets.get_name_of_category(time_xml_line.category);
 
                 // --------------------------- формироание описания ---------------------------
 
@@ -380,7 +375,7 @@ public partial class settings
             if (line[0] != "") coefficients.Add(coefficient);
         }
     }
-    public float get_coefficient(int price)
+    public float get_coefficient(float price)
     {
         foreach (float[] range in coefficients)
             if ((price >= range[0]) && (price <= range[1]))
@@ -391,6 +386,16 @@ public partial class settings
     }
     public string get_name_of_category(int category_xml)
     {
-        return "category";
+        string category_Str = "";
+        // категория обновленна, отличная от файла хмл, взятая из фаила соотнесение категории
+        int category = Convert.ToInt32(categoryes.Find(cat => Convert.ToInt32(cat[0]) == category_xml)[1]);
+
+        // назваие категории из фаила соотнесение категории соотнесенная по номеру
+        try     { category_Str = name_of_categoryes.Find(cat => Convert.ToInt32(cat[0]) == category)[1]; }
+        catch   {}
+        if (category_Str != "")
+            return category_Str;
+
+        return "{категория не найдена}";
     }
 }
