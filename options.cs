@@ -4,7 +4,7 @@ using System.Reflection;
 public class Options
 {
 
-    public string proizvoditel = "hi";
+    public string proizvoditel = "";
     public string description = "l";
 
     public string max_oboroty_ob_min;

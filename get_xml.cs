@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
@@ -79,26 +80,14 @@ public class Get_xml
     }
 }
 
-
 public class Xml_offer
 {
-    List<string> prepositions = new List<string> {
-        "A"/*латиница*/, "А"
-    };
-
-    List<string> stop_words = new List<string>
-    {
-        "d\\s*=", "h\\s*=", "r\\s*=", "А\\.", "№", "SchE",
-        "ш\\."
-    };
-
     public string id, id_with_prefix;
     public float price, price_time;
-
     public string name, short_name, vendor, sales_notes, composition; // cостав
 
     // создание короткого имени
-    public string name_short(string name)
+    public string name_short(string name, List<string> prepositions, List<string> stop_words)
     {
         //Regex short_name = new Regex(",");
         //string[] rx_short_name = short_name.Split(name);
@@ -161,5 +150,4 @@ public class Xml_offer
 
         return name;
     }
-
 }

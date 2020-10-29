@@ -141,25 +141,54 @@ namespace stl
             // --------------------------- добавление в список индексов ---------------------------
             foreach (Options option in options)
             {
-                try { index.Add(Convert.ToInt32(option.artnumber)); }
-                catch {}
+                try
+                {
+                    Regex r_id = new Regex("(.*)\\/(\\d*)$");
+                    Match m_id = r_id.Match(option.id);
+                    int id = Convert.ToInt32(m_id.Groups[2].Value);
+                    index.Add(id);
+                    option.artnumber = id.ToString();
+                }
+                catch
+                {
+                }
             }
             // --------------------------- добавление в список индексов ---------------------------
 
             // получение данных из хмл файла учитывая только индексы которые есть в списке options
             Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
-            foreach (Xml_offer line_data in xml_data.get_xml_data)
+
+            //foreach (Options option in options)
+            //{
+            //    option.proizvoditel = xml_data.get_xml_data.Find(data => data.id == option.artnumber).vendor;
+            //}
+            //foreach (Xml_offer line_data in xml_data.get_xml_data)
+            //{
+            //    //
+            //}
+            // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
+            foreach (Options option in options)
             {
-                //
-            }
-                // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
-                foreach (Options option in options)
-            {
+                Xml_offer time_xml_line = xml_data.get_xml_data.Find(data => data.id == option.artnumber);
+                option.proizvoditel = time_xml_line.vendor;
+
+                // --------------------------- формироание описания ---------------------------
+                string name = time_xml_line.name;
+                string short_name = time_xml_line.name_short(time_xml_line.name, sets.prepositions, sets.stop_words);
+                string proisvoditel = option.proizvoditel;
+                string strana_prois = option.strana_proizvoditel;
+                string artnum = option.artnumber;
+                string material = option.material;
+                string features = option.features;
+
+                // --------------------------- формироание описания ---------------------------
 
                 foreach (string tl in title)
                 {
 
-                    if (tl == "DESCRIPTION" /*&& option.EFFEKT != ""*/) {}
+                    if (tl == "proizvoditel" && option.proizvoditel != "")
+                    {
+                    }
 
                     // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
@@ -188,17 +217,23 @@ namespace stl
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Get_xml xml_data = new Get_xml("xml\\kanctovary.xml", index);
+            //
         }
     }
 }
 
-public partial  class settings
+public partial class settings
 {
     List<string[]> options;
+    public List<string> prepositions = new List<string>     { "A"/*латиница*/, "А" };                                           // список предлогов для обрывки фразы
+    public List<string> stop_words = new List<string>       { "d\\s*=", "h\\s*=", "r\\s*=", "А\\.", "№", "SchE",  "ш\\." };     // список стоп слов для обрывки фразы
+    public List<float[]> coefficient = new List<float[]>    {};                                                                 // список коэффициентов
+    List<string[]> mod_catalog = new List<string[]>();                                                                          // список категорий
 
-    public settings() {
+    public settings()
+    {
         options = new List<string[]>();
+        get_stop_words();
     }
 
     public List<string[]> add_options(string file_name)
@@ -226,5 +261,34 @@ public partial  class settings
         }
 
         return options;
+    }
+    // загрузка слов для обрезания фразы и предлоги
+    public void get_stop_words()
+    {
+        string stop_wrd = File.ReadAllText("cfg\\stop words.csv", Encoding.Default);
+        //richTextBox1.Text = stop_wrd;
+
+        Regex short_name = new Regex("(.*)\r\n");
+        MatchCollection words = short_name.Matches(stop_wrd);
+        //richTextBox2.Text = words.Count.ToString();
+
+        Regex sub_string = new Regex(";");
+        string[] line;
+
+        int i = -1;
+        foreach (Match m in words)
+        {
+            i++;
+            if (i == 0) continue;
+            line = sub_string.Split(m.Groups[1].Value);
+            line[1] = line[1].Replace(":", "\\:");
+            line[1] = line[1].Replace("(", "\\(");
+            line[1] = line[1].Replace(".", "\\.");
+            line[1] = line[1].Replace("=", "\\=");
+            line[1] = line[1].Replace(" ", "\\s+");
+
+            if (line[0] != "") prepositions.Add(line[0]);
+            if (line[1] != "") stop_words.Add(line[1]);
+        }
     }
 }
