@@ -174,6 +174,20 @@ namespace stl
                 string features = option.features;
                 string category = sets.get_name_of_category(time_xml_line.category);
 
+                string description =
+                    "<H2>" + short_name + "</H2>" +
+                    "<p>" + name + " " +
+                    "артикул " + artnum + " " +
+                    "по цене " + price + " руб. в наличии на складе.</p>" +
+                    "<p>Производитель — " + proisvoditel +"</p>" +
+                    "<p>Страна производитель — " + strana_prois +"</p>" +
+                    "<p>Сделано из: " + material +"</p>" +
+                    "<p>Особенности: " + features +"</p>" +
+                    "<p>Мы предлагаем " + category + " ведущих Российских производителей, а также налажена поставка товаров из Китая и Германии. Приобрести данный товар Вы можете on-line на нашем сайте, позвонив по телефону — 8-800-2000-600, а также в офисе в Москве.</p>"
+                    ;
+
+                option.description = description;
+
                 // --------------------------- формироание описания ---------------------------
 
                 foreach (string tl in title)
@@ -386,13 +400,15 @@ public partial class settings
     }
     public string get_name_of_category(int category_xml)
     {
+        int category = 9;
         string category_Str = "";
         // категория обновленна, отличная от файла хмл, взятая из фаила соотнесение категории
-        int category = Convert.ToInt32(categoryes.Find(cat => Convert.ToInt32(cat[0]) == category_xml)[1]);
+        try     { category = Convert.ToInt32(categoryes.Find(cat => Convert.ToInt32(cat[0]) == category_xml)[1]); }
+        catch   { return "{категория не найдена}"; }
 
         // назваие категории из фаила соотнесение категории соотнесенная по номеру
-        try     { category_Str = name_of_categoryes.Find(cat => Convert.ToInt32(cat[0]) == category)[1]; }
-        catch   {}
+        try { category_Str = name_of_categoryes.Find(cat => Convert.ToInt32(cat[0]) == category)[1]; }
+        catch   { return "{категория не найдена}"; }
         if (category_Str != "")
             return category_Str;
 
