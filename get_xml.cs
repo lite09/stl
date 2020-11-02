@@ -20,6 +20,7 @@ public class Get_xml
         file_xml_data = new StringReader(File.ReadAllText(xml));
         ienum_xml = offer(file_xml_data, index);
         get_xml_data = ienum_xml.ToList();
+        //MessageBox.Show("end");
     }
 
     IEnumerable<Xml_offer> offer(StringReader string_xml, List <int> index)
@@ -57,7 +58,8 @@ public class Get_xml
                                 }
                             }
 
-                            if (!find) goto next_loop;
+                            if (!find)
+                                goto next_loop;
 
                             offer.name = el.Element("name").Value; offer.name = offer.name.Replace(";", " ");
                             offer.price = offer.price_time = Convert.ToSingle(el.Element("price").Value, CultureInfo.InvariantCulture);
