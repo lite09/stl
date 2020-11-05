@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
+//using System.Windows.Forms;
 
 public class Options
 {
 
     public string proizvoditel = "";
     public string description = "l";
+    public float a, b, c, weight_orig, weight;
 
     public string max_oboroty_ob_min;
     public string MAX_OBOROTY_OB_MIN{ get { return max_oboroty_ob_min; } set { max_oboroty_ob_min = value; } }
@@ -805,6 +810,7 @@ public class Options
     public string price_for_;
     public string PRICE_FOR_{ get { return price_for_; } set { price_for_ = value; } }
 
+
     public string get_property(string property, Options op)
     {
         if (property == "") {
@@ -821,5 +827,67 @@ public class Options
             return value.ToString();
         }
         catch   { return ""; }
+    }
+
+    public void get_abc_weight(List <settings.coefficient_of_package> cop, ref List<Xml_offer> xml)
+    {
+        try
+        {
+            Regex upa = new Regex(@"(\d*,?\d*)\s*см\s*.\s*(\d*,?\d*)\s*см\s*.\s*(\d*,?\d*)");
+            Match m_abc = upa.Match(size_upa);
+
+            a = Convert.ToSingle(m_abc.Groups[1].Value);
+            b = Convert.ToSingle(m_abc.Groups[2].Value);
+            c = Convert.ToSingle(m_abc.Groups[3].Value);
+
+
+        }
+        catch {
+            //MessageBox.Show("Ошибка при формировании габаритов и веса");
+            //a = b = c = 0;
+            return;
+        }
+
+        try
+        {
+            Regex r_weight = new Regex(@"(\d*)");
+            weight_orig = Convert.ToSingle(r_weight.Match(ves_brutto).Value);
+        }
+        catch
+        {
+            //MessageBox.Show("Ошибка при формировании веса");
+            //weight = weight_orig = 0;
+            return;
+        }
+
+        //  коррректировка
+        bool no_c = true;
+        string categoryId = xml.Find(l => l.id == artnumber).category.ToString();   // категория из xml
+        const float coefficient = 1.3f;
+        foreach (var item in cop)
+        {
+            if (item.category_id == Convert.ToInt32(categoryId))
+            {
+
+                weight = Convert.ToSingle(weight_orig, CultureInfo.InvariantCulture) * item.coefficient_of_massa;
+                weight = Convert.ToSingle(Math.Round(weight, 2));
+
+                a = Convert.ToSingle(Math.Round(a * item.coefficient_of_dimensions, 2));
+                b = Convert.ToSingle(Math.Round(b * item.coefficient_of_dimensions, 2));
+                c = Convert.ToSingle(Math.Round(c * item.coefficient_of_dimensions, 2));
+
+                no_c = false;
+
+                break;
+            }
+        }
+
+        if (no_c)
+        {
+            a = Convert.ToSingle(Math.Round(a * coefficient, 2));
+            b = Convert.ToSingle(Math.Round(b * coefficient, 2));
+            c = Convert.ToSingle(Math.Round(c * coefficient, 2));
+            weight = Convert.ToSingle(Math.Round(weight_orig * coefficient, 2));
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace stl
 
         private void button1_Click(object sender, EventArgs e)
         {
-            settings sets = new settings("cfg\\Таблица свойств.csv", "cfg\\Соотнесение категорий.csv", "cfg\\id категории.csv", "cfg\\Формирование розничных цен.csv");
+            settings sets = new settings("cfg\\Таблица свойств.csv", "cfg\\Соотнесение категорий.csv", "cfg\\id категории.csv", "cfg\\Формирование розничных цен.csv", "cfg\\Таблица множителей габаритов и массы.csv");
             //var l = sets.get_coefficient(9);
             //var cat = sets.get_name_of_category(22941);
             List<Options> options = new List<Options>();            // опции всех файлов
@@ -195,6 +195,11 @@ namespace stl
             string[] files_xml = Directory.GetFiles("xml");
             Get_xml xml_data = new Get_xml(files_xml[0], index);
 
+            // --------------------------- формирование габаритов и веса --------------------------
+            foreach (Options option in options)
+                option.get_abc_weight(sets.coefficients_volume_and_mass, ref xml_data.get_xml_data);
+            // --------------------------- формирование габаритов и веса --------------------------
+
             // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
             foreach (Options option in options)
             {
@@ -281,6 +286,13 @@ public partial class settings
     public List<float[]> coefficients   = new List<float[]>{};                                                                          // список коэффициентов
     List<string[]> categoryes           = new List<string[]>();                                                                         // список категорий
     List<string[]> name_of_categoryes   = new List<string[]>();                                                                         // список соотношений имени и кода категорий
+                                                                                                                                        // Коэффициенты для габаритов и массы
+    public List<coefficient_of_package>
+        coefficients_volume_and_mass = new List<coefficient_of_package>();
+    public struct coefficient_of_package
+    {
+        public int category_id; public float coefficient_of_massa; public float coefficient_of_dimensions;
+    }
 
     public settings()
     {
@@ -306,12 +318,13 @@ public partial class settings
         get_stop_words();
     }
 
-    public settings(string file_options, string categoryes, string file_get_name_of_category, string file_coefficients)
+    public settings(string file_options, string categoryes, string file_get_name_of_category, string file_coefficients, string file_of_coefficients)
     {
         add_options(file_options);
         get_category(categoryes);
         get_name_of_category(file_get_name_of_category);
         get_coefficients(file_coefficients);
+        get_coefficients_vol_mass(file_of_coefficients);
         get_stop_words();
     }
 
@@ -441,6 +454,31 @@ public partial class settings
 
         MessageBox.Show("Коэффициент не был найден");
         return 2;
+    }
+    private void get_coefficients_vol_mass(string file_of_coefficients)
+    {
+        string cf = null;
+        try     { cf = File.ReadAllText(file_of_coefficients, Encoding.Default); }
+        catch   { MessageBox.Show("Не удалось загрузить файл с коэффициентами"); }
+
+        Regex get_line = new Regex("(.*)\r\n");
+        MatchCollection words = get_line.Matches(cf);
+        Regex sub_string = new Regex(";");
+        string[] line; int i = 0;
+
+        foreach (Match m in words)
+        {
+            if (i == 0) { i++; continue; }
+            line = sub_string.Split(m.Groups[1].Value);
+            coefficient_of_package info = new coefficient_of_package();
+            if (line[0] != "")
+            {
+                info.category_id = Convert.ToInt32(line[0]);
+                info.coefficient_of_massa = Convert.ToSingle(line[1]);
+                info.coefficient_of_dimensions = Convert.ToSingle(line[2]);
+            }
+            if (line[0] != "") coefficients_volume_and_mass.Add(info);
+        }
     }
     public string get_name_of_category(int category_xml)
     {
