@@ -10,7 +10,10 @@ public class Options
 
     public string proizvoditel = "";
     public string description = "l";
+    public string delivery_package_type = "нестандартная";
+    public string delivery_package = "картонная коробка";
     public float a, b, c, weight_orig, weight;
+    public float length_pack, width_pack, height_pack, weight_v;    // оригинальные навания 
 
     public string max_oboroty_ob_min;
     public string MAX_OBOROTY_OB_MIN{ get { return max_oboroty_ob_min; } set { max_oboroty_ob_min = value; } }
@@ -32,8 +35,8 @@ public class Options
     public string V_RAZOBRANNOM_VIDE{ get { return v_razobrannom_vide; } set { v_razobrannom_vide = value; } }
     public string v_upakovke_sht;
     public string V_UPAKOVKE_SHT{ get { return v_upakovke_sht; } set { v_upakovke_sht = value; } }
-    public string weight_v;
-    public string WEIGHT_V{ get { return weight_v; } set { weight_v = value; } }
+    //public string weight_v;
+    //public string WEIGHT_V{ get { return weight_v; } set { weight_v = value; } }
     public string ves_g_obem_ml;
     public string VES_G_OBEM_ML{ get { return ves_g_obem_ml; } set { ves_g_obem_ml = value; } }
     public string weight_kg;
@@ -842,23 +845,14 @@ public class Options
 
 
         }
-        catch {
-            //MessageBox.Show("Ошибка при формировании габаритов и веса");
-            //a = b = c = 0;
-            return;
-        }
+        catch {}
 
         try
         {
             Regex r_weight = new Regex(@"(\d*)");
             weight_orig = Convert.ToSingle(r_weight.Match(ves_brutto).Value);
         }
-        catch
-        {
-            //MessageBox.Show("Ошибка при формировании веса");
-            //weight = weight_orig = 0;
-            return;
-        }
+        catch {}
 
         //  коррректировка
         bool no_c = true;
@@ -889,5 +883,7 @@ public class Options
             c = Convert.ToSingle(Math.Round(c * coefficient, 2));
             weight = Convert.ToSingle(Math.Round(weight_orig * coefficient, 2));
         }
+        length_pack = a; width_pack = b; height_pack = c; weight_v = weight_orig;   // дублирование для оригинальных названий
+
     }
 }

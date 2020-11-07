@@ -91,7 +91,9 @@ namespace stl
                     }
                     if (!is_tl)
                         title.Add(option);
-                    if (i == 5) { title.Add("proizvoditel"); title.Add("DESCRIPTION"); }
+                    if (i == 5) {   title.Add("proizvoditel"); title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
+                                    title.Add("DELIVERY_PACKAGE_TYPE"); title.Add("DELIVERY_PACKAGE");
+                    }
                 }
                 //sb.Append(option + ";");
 
@@ -132,7 +134,7 @@ namespace stl
                     buf = "";
                     for (i = 0; i < cells.Length; i++)
                     {
-                        if (i == 5) buf += ";;";
+                        if (i == 5) buf += ";;;;;;;;;";
                         if (sets.equal(i, not_found_index))
                             continue;
                         buf += cells[i] + ";";
@@ -170,6 +172,10 @@ namespace stl
                     options.AddRange(options_values);
                 }
             }
+
+            // удаляем временные файлы
+            foreach (string file_option in files_opions)
+                File.Delete(Path.GetFileName(file_option));
 
             foreach (var tl in title) sb.Append(tl + ";");
             sb.Append("\r\n");
@@ -252,7 +258,14 @@ namespace stl
                         }
                         sb.Append(cut_double[0] + ";");
                     }
-                    // ------------------------------------------- игнорирование дубля ------------------------------------------- 
+                    // ------------------------------------------- игнорирование дубля -------------------------------------------
+                    else if (tl == "LENGTH_PACK" || tl == "WIDTH_PACK" || tl == "HEIGHT_PACK" || tl == "WEIGHT_V" || tl == "WEIGHT")
+                    {
+                        if (option.get_property(tl.ToLower(), option) == "0")
+                            sb.Append(";");
+                        else
+                            sb.Append(option.get_property(tl.ToLower(), option) + ";");
+                    }
                     else
                     {
                         //string id = option.get_property(tl.ToLower(), option);
@@ -263,11 +276,8 @@ namespace stl
                 //string hi = nameof(option);
             }
 
-            // удаляем временные файлы
-            foreach (string file_option in files_opions)
-                File.Delete(Path.GetFileName(file_option));
             // сохраняем говый файл
-            File.WriteAllText("вывод.csv", sb.ToString(), Encoding.GetEncoding(1251));
+            File.WriteAllText(Path.GetFileNameWithoutExtension(files_xml[0]) + ".csv", sb.ToString(), Encoding.GetEncoding(1251));
             // --------------------------- выборка из массива классов свойств в string bufer для созранения в текстовый файл --------------------------- 
         }
 
