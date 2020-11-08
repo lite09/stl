@@ -180,6 +180,9 @@ namespace stl
             foreach (var tl in title) sb.Append(tl + ";");
             sb.Append("\r\n");
 
+            //var hi = options.Find(l => l.artnumber == "1637081");
+            //string col = hi.kolichestvo_cvetov;
+
             // --------------------------- добавление в список индексов ---------------------------
             foreach (Options option in options)
             {
@@ -243,9 +246,7 @@ namespace stl
                 {
                     string value = option.get_property(tl.ToLower(), option);
 
-                    if (tl == "proizvoditel" && option.proizvoditel != "")
-                    {
-                    }
+                    if (tl == "proizvoditel" && option.proizvoditel != "") {}
 
                     // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     string[] cut_double = {""};
@@ -264,10 +265,15 @@ namespace stl
                             sb.Append(";");
                         else
                         {
-                            value = value.Replace(",", ".");
+                            //value = value.Replace(",", ".");
                             sb.Append(value + ";");
                             //value = option.get_property(tl.ToLower(), option);
                         }
+                    }
+                    else if (tl == "DIAMETR_PISHUSHCHEGO_UZLA_MM")
+                    {
+                        value = value.Replace(".", ",");
+                        sb.Append(value + ";");
                     }
                     else
                         sb.Append(value + ";");
