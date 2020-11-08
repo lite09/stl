@@ -816,7 +816,8 @@ public class Options
 
     public string get_property(string property, Options op)
     {
-        if (property == "") {
+        if (property == "height_pack")
+        {
         }
         try     {
             FieldInfo i = typeof(Options).GetField(property.ToLower());
@@ -827,12 +828,15 @@ public class Options
             if (value == null)
                 return "";
 
-            return value.ToString();
+            string s = value.ToString();
+            s = s.ToString(CultureInfo.InvariantCulture);
+            //return value.ToString();
+            return s;
         }
         catch   { return ""; }
     }
 
-    public void get_abc_weight(List <settings.coefficient_of_package> cop, ref List<Xml_offer> xml)
+    public void get_abc_weight(List<settings.coefficient_of_package> cop, ref List<Xml_offer> xml)
     {
         try
         {
@@ -845,30 +849,31 @@ public class Options
 
 
         }
-        catch {}
+        catch { }
 
         try
         {
             Regex r_weight = new Regex(@"(\d*)");
             weight_orig = Convert.ToSingle(r_weight.Match(ves_brutto).Value);
         }
-        catch {}
+        catch { }
 
         //  коррректировка
         bool no_c = true;
         string categoryId = xml.Find(l => l.id == artnumber).category.ToString();   // категория из xml
         const float coefficient = 1.3f;
+        //CultureInfo culture = new CultureInfo("en-US");
         foreach (var item in cop)
         {
             if (item.category_id == Convert.ToInt32(categoryId))
             {
 
                 weight = Convert.ToSingle(weight_orig, CultureInfo.InvariantCulture) * item.coefficient_of_massa;
-                weight = Convert.ToSingle(Math.Round(weight, 2));
+                weight = Convert.ToSingle(Math.Round(weight, 3));
 
-                a = Convert.ToSingle(Math.Round(a * item.coefficient_of_dimensions, 2));
-                b = Convert.ToSingle(Math.Round(b * item.coefficient_of_dimensions, 2));
-                c = Convert.ToSingle(Math.Round(c * item.coefficient_of_dimensions, 2));
+                a = Convert.ToSingle(Math.Round(a * item.coefficient_of_dimensions, 3));
+                b = Convert.ToSingle(Math.Round(b * item.coefficient_of_dimensions, 3));
+                c = Convert.ToSingle(Math.Round(c * item.coefficient_of_dimensions, 3));
 
                 no_c = false;
 
@@ -878,10 +883,10 @@ public class Options
 
         if (no_c)
         {
-            a = Convert.ToSingle(Math.Round(a * coefficient, 2));
-            b = Convert.ToSingle(Math.Round(b * coefficient, 2));
-            c = Convert.ToSingle(Math.Round(c * coefficient, 2));
-            weight = Convert.ToSingle(Math.Round(weight_orig * coefficient, 2));
+            a = Convert.ToSingle(Math.Round(a * coefficient, 3));
+            b = Convert.ToSingle(Math.Round(b * coefficient, 3));
+            c = Convert.ToSingle(Math.Round(c * coefficient, 3));
+            weight = Convert.ToSingle(Math.Round(weight_orig * coefficient, 3));
         }
         length_pack = a; width_pack = b; height_pack = c; weight_v = weight_orig;   // дублирование для оригинальных названий
 

@@ -91,7 +91,7 @@ namespace stl
                     }
                     if (!is_tl)
                         title.Add(option);
-                    if (i == 5) {   title.Add("proizvoditel"); title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
+                    if (i == 5) {   title.Add("PROIZVODITEL"); title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
                                     title.Add("DELIVERY_PACKAGE_TYPE"); title.Add("DELIVERY_PACKAGE");
                     }
                 }
@@ -241,6 +241,7 @@ namespace stl
                 char[] se = {'_', '_'};
                 foreach (string tl in title)
                 {
+                    string value = option.get_property(tl.ToLower(), option);
 
                     if (tl == "proizvoditel" && option.proizvoditel != "")
                     {
@@ -251,26 +252,25 @@ namespace stl
                     if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
                     {
                         //words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
-                        words = option.get_property(tl.ToLower(), option);
-                        if (words != "")
-                        {
-                            cut_double = words.Split(se);
-                        }
+                        if (value != "")
+                            cut_double = value.Split(se);
+
                         sb.Append(cut_double[0] + ";");
                     }
                     // ------------------------------------------- игнорирование дубля -------------------------------------------
                     else if (tl == "LENGTH_PACK" || tl == "WIDTH_PACK" || tl == "HEIGHT_PACK" || tl == "WEIGHT_V" || tl == "WEIGHT")
                     {
-                        if (option.get_property(tl.ToLower(), option) == "0")
+                        if (value == "0")
                             sb.Append(";");
                         else
-                            sb.Append(option.get_property(tl.ToLower(), option) + ";");
+                        {
+                            value = value.Replace(",", ".");
+                            sb.Append(value + ";");
+                            //value = option.get_property(tl.ToLower(), option);
+                        }
                     }
                     else
-                    {
-                        //string id = option.get_property(tl.ToLower(), option);
-                        sb.Append(option.get_property(tl.ToLower(), option) + ";");
-                    }
+                        sb.Append(value + ";");
                 }
                 sb.Append("\r\n");
                 //string hi = nameof(option);
