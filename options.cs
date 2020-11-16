@@ -25,6 +25,8 @@ public class Options
     public string AROMATIZIROVANNYYE{ get { return aromatizirovannyye; } set { aromatizirovannyye = value; } }
     public string artnumber;
     public string ARTNUMBER{ get { return artnumber; } set { artnumber = value; } }
+    public string artnumber_post;
+    public string ARTNUMBER_POST{ get { return artnumber_post; } set { artnumber_post = value; } }
     public string bokovye_stenki;
     public string BOKOVYE_STENKI{ get { return bokovye_stenki; } set { bokovye_stenki = value; } }
     public string v_komplekte;
@@ -35,8 +37,8 @@ public class Options
     public string V_RAZOBRANNOM_VIDE{ get { return v_razobrannom_vide; } set { v_razobrannom_vide = value; } }
     public string v_upakovke_sht;
     public string V_UPAKOVKE_SHT{ get { return v_upakovke_sht; } set { v_upakovke_sht = value; } }
-    //public string weight_v;
-    //public string WEIGHT_V{ get { return weight_v; } set { weight_v = value; } }
+    public string weight_v_gr;
+    public string WEIGHT_V_GR { get { return weight_v_gr; } set { weight_v_gr = value; } }
     public string ves_g_obem_ml;
     public string VES_G_OBEM_ML{ get { return ves_g_obem_ml; } set { ves_g_obem_ml = value; } }
     public string weight_kg;
@@ -846,8 +848,6 @@ public class Options
             a = Convert.ToSingle(m_abc.Groups[1].Value);
             b = Convert.ToSingle(m_abc.Groups[2].Value);
             c = Convert.ToSingle(m_abc.Groups[3].Value);
-
-
         }
         catch { }
 
@@ -871,9 +871,9 @@ public class Options
                 weight = Convert.ToSingle(weight_orig, CultureInfo.InvariantCulture) * item.coefficient_of_massa;
                 weight = Convert.ToSingle(Math.Round(weight, 3));
 
-                a = Convert.ToSingle(Math.Round(a * item.coefficient_of_dimensions, 3));
-                b = Convert.ToSingle(Math.Round(b * item.coefficient_of_dimensions, 3));
-                c = Convert.ToSingle(Math.Round(c * item.coefficient_of_dimensions, 3));
+                //a = Convert.ToSingle(Math.Round(a * item.coefficient_of_dimensions, 3));
+                //b = Convert.ToSingle(Math.Round(b * item.coefficient_of_dimensions, 3));
+                //c = Convert.ToSingle(Math.Round(c * item.coefficient_of_dimensions, 3));
 
                 no_c = false;
 
@@ -883,12 +883,11 @@ public class Options
 
         if (no_c)
         {
-            a = Convert.ToSingle(Math.Round(a * coefficient, 3));
-            b = Convert.ToSingle(Math.Round(b * coefficient, 3));
-            c = Convert.ToSingle(Math.Round(c * coefficient, 3));
+            //a = Convert.ToSingle(Math.Round(a * coefficient, 3));
+            //b = Convert.ToSingle(Math.Round(b * coefficient, 3));
+            //c = Convert.ToSingle(Math.Round(c * coefficient, 3));
             weight = Convert.ToSingle(Math.Round(weight_orig * coefficient, 3));
         }
         length_pack = a; width_pack = b; height_pack = c; weight_v = weight_orig;   // дублирование для оригинальных названий
-
     }
 }

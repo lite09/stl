@@ -178,6 +178,7 @@ namespace stl
                 File.Delete(Path.GetFileName(file_option));
 
             foreach (var tl in title) sb.Append(tl + ";");
+            sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
             sb.Append("\r\n");
 
             //var hi = options.Find(l => l.artnumber == "1637081");
@@ -229,14 +230,14 @@ namespace stl
                 string description =
                     "<H2>" + short_name + "</H2>" +
                     "<p>" + name + " ";
-                if (artnum != "")       description += "артикул " + artnum + " ";
-                                        description += "по цене " + price + " руб. в наличии на складе.</p>";
+                if (artnum != "") description += "артикул " + artnum + " ";
+                description += "по цене " + price + " руб. в наличии на складе.</p>";
                 if (proisvoditel != "") description += "<p>Производитель — " + proisvoditel + "</p>";
 
                 if (strana_prois != "") description += "<p>Страна производитель — " + strana_prois + "</p>";
-                if (material != "")     description += "<p>Сделано из: " +   material + "</p>";
-                if (features != "")     description += "<p>Особенности: " +  features + "</p>";
-                                        description += "<p>Мы предлагаем " + category + " ведущих Российских производителей, а также налажена поставка товаров из Китая и Германии. Приобрести данный товар Вы можете on-line на нашем сайте, позвонив по телефону — 8-800-2000-600, а также в офисе в Москве.</p>";
+                if (material != "") description += "<p>Сделано из: " + material + "</p>";
+                if (features != "") description += "<p>Особенности: " + features + "</p>";
+                description += "<p>Мы предлагаем " + category + " ведущих Российских производителей, а также налажена поставка товаров из Китая и Германии. Приобрести данный товар Вы можете on-line на нашем сайте, позвонив по телефону — 8-800-2000-600, а также в офисе в Москве.</p>";
 
                 option.description = description;
 
@@ -246,7 +247,8 @@ namespace stl
                 {
                     string value = option.get_property(tl.ToLower(), option);
 
-                    if (tl == "proizvoditel" && option.proizvoditel != "") {}
+                    if (tl == "WEIGHT_V_GR" && option.WEIGHT_V_GR != "") {
+                    }
 
                     // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     string[] cut_double = {""};
@@ -265,9 +267,7 @@ namespace stl
                             sb.Append(";");
                         else
                         {
-                            //value = value.Replace(",", ".");
                             sb.Append(value + ";");
-                            //value = option.get_property(tl.ToLower(), option);
                         }
                     }
                     else if (tl == "DIAMETR_PISHUSHCHEGO_UZLA_MM")
@@ -278,6 +278,7 @@ namespace stl
                     else
                         sb.Append(value + ";");
                 }
+                sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
                 sb.Append("\r\n");
                 //string hi = nameof(option);
             }
