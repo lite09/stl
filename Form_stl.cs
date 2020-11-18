@@ -1,4 +1,4 @@
-п»їusing CsvHelper;
+using CsvHelper;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,26 +10,30 @@ using System.Windows.Forms;
 
 namespace stl
 {
-    public partial class Form1 : Form
+    public partial class Form_stl : Form
     {
-        public Form1()
+        public Form_stl()
         {
             InitializeComponent();
         }
 
-        private void С‚Р°Р±Р»РёС†Р°РЎРІРѕР№СЃС‚РІToolStripMenuItem_Click(object sender, EventArgs e)
+        private void таблицаСвойствToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e) 
         {
-            settings sets = new settings("cfg\\РўР°Р±Р»РёС†Р° СЃРІРѕР№СЃС‚РІ.csv", "cfg\\РЎРѕРѕС‚РЅРµСЃРµРЅРёРµ РєР°С‚РµРіРѕСЂРёР№.csv", "cfg\\id РєР°С‚РµРіРѕСЂРёРё.csv", "cfg\\Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЂРѕР·РЅРёС‡РЅС‹С… С†РµРЅ.csv", "cfg\\РўР°Р±Р»РёС†Р° РјРЅРѕР¶РёС‚РµР»РµР№ РіР°Р±Р°СЂРёС‚РѕРІ Рё РјР°СЃСЃС‹.csv");
+            make_op(@"C:\Users\и\source\repos\stl\bin\Debug\xml\kanctovary.xml", @"C:\Users\и\source\repos\stl\bin\Debug\csv", @"C:\Users\и\Desktop\", @"C:\Users\и\source\repos\stl\bin\Debug\cfg");
+        }
+        public void make_op(string xml, string folder_options, string save, string cfg)
+        {
+            settings sets = new settings(cfg + "\\Таблица свойств.csv", cfg + "\\Соотнесение категорий.csv", cfg + "\\id категории.csv", cfg + "\\Формирование розничных цен.csv", cfg + "\\Таблица множителей габаритов и массы.csv", cfg);
             //var l = sets.get_coefficient(9);
             //var cat = sets.get_name_of_category(22941);
-            List<Options> options = new List<Options>();            // РѕРїС†РёРё РІСЃРµС… С„Р°Р№Р»РѕРІ
-            List<int> index = new List<int>();                      // СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ РёР· РґР°РЅРЅС‹С… РїР°СЂСЃРµСЂР°
-            string[] files_opions = Directory.GetFiles("csv");      // СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ
+            List<Options> options = new List<Options>();                        // опции всех файлов
+            List<int> index = new List<int>();                                  // список индексов из данных парсера
+            string[] files_opions = Directory.GetFiles(folder_options);       // список файлов
             string name_f = "";
             string save_uload = "";
             List<string> title_tmp = new List<string>();
@@ -47,13 +51,13 @@ namespace stl
                 name_f = Path.GetFileNameWithoutExtension(file_option);
                 string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
 
-                // -------------------------------------------- Р—Р°РіРѕР»РѕРІРѕРє --------------------------------------------
+                // -------------------------------------------- Заголовок --------------------------------------------
                 Regex sub_string = new Regex(";");
 
                 words = get_line.Match(fileText).Groups[1].Value;
 
                 string[] title_l = sub_string.Split(words);
-                List <int> not_found_index = new List<int>();       // РРЅРґРµРєСЃС‹ СЃС‚РѕР»Р±С†РѕРІ РЅРµ РЅР°Р№РґРµРЅРЅС‹С… РІ Р·Р°РіРѕР»РѕРІРєРµ
+                List<int> not_found_index = new List<int>();       // Индексы столбцов не найденных в заголовке
 
                 for (int il = 0; il < title_l.Length; il++)
                 {
@@ -62,13 +66,13 @@ namespace stl
                         if (title_l[il] == "\"" + it[0] + "\"")
                         {
                             fine = true;
-                            title_tmp.Add(it[1]);   // Р·Р°РіРѕР»РѕРІРѕРє РёР· РЅР°РґРµРЅРЅС‹С… СЃРІРѕР№СЃС‚РІ
+                            title_tmp.Add(it[1]);   // заголовок из наденных свойств
                         }
 
                     if (!fine)
                     {
                         not_found_index.Add(il);
-                        unload.Add(title_l[il]);      // РЅРµ РЅР°Р№РґРµРЅРЅС‹Рµ СЃРІРѕР№СЃС‚РІР°
+                        unload.Add(title_l[il]);      // не найденные свойства
                     }
                 }
 
@@ -91,19 +95,21 @@ namespace stl
                     }
                     if (!is_tl)
                         title.Add(option);
-                    if (i == 5) {   title.Add("PROIZVODITEL"); title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
-                                    title.Add("DELIVERY_PACKAGE_TYPE"); title.Add("DELIVERY_PACKAGE");
+                    if (i == 5)
+                    {
+                        title.Add("PROIZVODITEL"); title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
+                        title.Add("DELIVERY_PACKAGE_TYPE"); title.Add("DELIVERY_PACKAGE");
                     }
                 }
                 //sb.Append(option + ";");
 
                 //sb.Append("\r\n");
-                // -------------------------------------------- Р—Р°РіРѕР»РѕРІРѕРє --------------------------------------------
+                // -------------------------------------------- Заголовок --------------------------------------------
 
 
                 foreach (string item in title)
                     normal_file.Append(item + ";");
-                normal_file.Append("\r\n");  // С„Р°Р№Р» СЃ РїСЂР°РІРёР»СЊРЅС‹Рј Р·Р°РіРѕР»РѕРІРєРѕРј
+                normal_file.Append("\r\n");  // файл с правильным заголовком
 
                 Regex manual_get_line = new Regex("https(.*)", RegexOptions.Multiline);
                 MatchCollection lines = get_line.Matches(fileText);
@@ -115,7 +121,7 @@ namespace stl
                 for (i = 1; i < lines.Count; i++)
                 {
                     if (i == lines.Count - 1) break;
-                    if (manual_get_line.IsMatch(lines[i+1].Value))
+                    if (manual_get_line.IsMatch(lines[i + 1].Value))
                         str_bl.Append(lines[i]);
                     else
                     {
@@ -151,7 +157,7 @@ namespace stl
                 if (save_uload != "")
                 {
                     File.WriteAllText("unload.txt", save_uload);
-                    MessageBox.Show("РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РіРѕР»РѕРІРєР° Р±С‹Р»Рё РЅР°Р№РґРµРЅРЅС‹.\r\nРќРµРґРѕСЃС‚Р°СЋС‰РёРµ СЃРІРѕР№СЃС‚РІР° СЃРѕС…РЅР°РЅРµРЅРЅС‹ РІ С„Р°Р№Р» unload.txt");
+                    MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
                 }
 
                 File.WriteAllText(name_f + ".csv", normal_file.ToString(), Encoding.GetEncoding(1251));
@@ -173,18 +179,18 @@ namespace stl
                 }
             }
 
-            // СѓРґР°Р»СЏРµРј РІСЂРµРјРµРЅРЅС‹Рµ С„Р°Р№Р»С‹
+            // удаляем временные файлы
             foreach (string file_option in files_opions)
                 File.Delete(Path.GetFileName(file_option));
 
             foreach (var tl in title) sb.Append(tl + ";");
-            sb.Remove(sb.Length - 1, 1);        // СѓРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЂР°Р·РґРµР»РёС‚РµР»СЊРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
+            sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
             sb.Append("\r\n");
 
             //var hi = options.Find(l => l.artnumber == "1637081");
             //string col = hi.kolichestvo_cvetov;
 
-            // --------------------------- РґРѕР±Р°РІР»РµРЅРёРµ РІ СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ ---------------------------
+            // --------------------------- добавление в список индексов ---------------------------
             foreach (Options option in options)
             {
                 try
@@ -199,24 +205,25 @@ namespace stl
                 {
                 }
             }
-            // --------------------------- РґРѕР±Р°РІР»РµРЅРёРµ РІ СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ ---------------------------
+            // --------------------------- добавление в список индексов ---------------------------
 
-            // РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· С…РјР» С„Р°Р№Р»Р° СѓС‡РёС‚С‹РІР°СЏ С‚РѕР»СЊРєРѕ РёРЅРґРµРєСЃС‹ РєРѕС‚РѕСЂС‹Рµ РµСЃС‚СЊ РІ СЃРїРёСЃРєРµ options
-            string[] files_xml = Directory.GetFiles("xml");
-            Get_xml xml_data = new Get_xml(files_xml[0], index);
+            // получение данных из хмл файла учитывая только индексы которые есть в списке options
+            //string[] files_xml = Directory.GetFiles("xml");
+            //Get_xml xml_data = new Get_xml(files_xml[0], index);
+            Get_xml xml_data = new Get_xml(xml, index);
 
-            // --------------------------- С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РіР°Р±Р°СЂРёС‚РѕРІ Рё РІРµСЃР° --------------------------
+            // --------------------------- формирование габаритов и веса --------------------------
             foreach (Options option in options)
                 option.get_abc_weight(sets.coefficients_volume_and_mass, ref xml_data.get_xml_data);
-            // --------------------------- С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РіР°Р±Р°СЂРёС‚РѕРІ Рё РІРµСЃР° --------------------------
+            // --------------------------- формирование габаритов и веса --------------------------
 
-            // --------------------------- РІС‹Р±РѕСЂРєР° РёР· РјР°СЃСЃРёРІР° РєР»Р°СЃСЃРѕРІ СЃРІРѕР№СЃС‚РІ РІ string bufer РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р» --------------------------- 
+            // --------------------------- выборка из массива классов свойств в string bufer для сохранения в текстовый файл --------------------------- 
             foreach (Options option in options)
             {
                 Xml_offer time_xml_line = xml_data.get_xml_data.Find(data => data.id == option.artnumber);
                 option.proizvoditel = time_xml_line.vendor;
 
-                // --------------------------- С„РѕСЂРјРёСЂРѕР°РЅРёРµ РѕРїРёСЃР°РЅРёСЏ ---------------------------
+                // --------------------------- формироание описания ---------------------------
                 string name = time_xml_line.name;
                 string short_name = time_xml_line.name_short(time_xml_line.name, sets.prepositions, sets.stop_words);
                 string proisvoditel = option.proizvoditel;
@@ -230,28 +237,29 @@ namespace stl
                 string description =
                     "<H2>" + short_name + "</H2>" +
                     "<p>" + name + " ";
-                if (artnum != "") description += "Р°СЂС‚РёРєСѓР» " + artnum + " ";
-                description += "РїРѕ С†РµРЅРµ " + price + " СЂСѓР±. РІ РЅР°Р»РёС‡РёРё РЅР° СЃРєР»Р°РґРµ.</p>";
-                if (proisvoditel != "") description += "<p>РџСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ вЂ” " + proisvoditel + "</p>";
+                if (artnum != "") description += "артикул " + artnum + " ";
+                description += "по цене " + price + " руб. в наличии на складе.</p>";
+                if (proisvoditel != "") description += "<p>Производитель — " + proisvoditel + "</p>";
 
-                if (strana_prois != "") description += "<p>РЎС‚СЂР°РЅР° РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊ вЂ” " + strana_prois + "</p>";
-                if (material != "") description += "<p>РЎРґРµР»Р°РЅРѕ РёР·: " + material + "</p>";
-                if (features != "") description += "<p>РћСЃРѕР±РµРЅРЅРѕСЃС‚Рё: " + features + "</p>";
-                description += "<p>РњС‹ РїСЂРµРґР»Р°РіР°РµРј " + category + " РІРµРґСѓС‰РёС… Р РѕСЃСЃРёР№СЃРєРёС… РїСЂРѕРёР·РІРѕРґРёС‚РµР»РµР№, Р° С‚Р°РєР¶Рµ РЅР°Р»Р°Р¶РµРЅР° РїРѕСЃС‚Р°РІРєР° С‚РѕРІР°СЂРѕРІ РёР· РљРёС‚Р°СЏ Рё Р“РµСЂРјР°РЅРёРё. РџСЂРёРѕР±СЂРµСЃС‚Рё РґР°РЅРЅС‹Р№ С‚РѕРІР°СЂ Р’С‹ РјРѕР¶РµС‚Рµ on-line РЅР° РЅР°С€РµРј СЃР°Р№С‚Рµ, РїРѕР·РІРѕРЅРёРІ РїРѕ С‚РµР»РµС„РѕРЅСѓ вЂ” 8-800-2000-600, Р° С‚Р°РєР¶Рµ РІ РѕС„РёСЃРµ РІ РњРѕСЃРєРІРµ.</p>";
+                if (strana_prois != "") description += "<p>Страна производитель — " + strana_prois + "</p>";
+                if (material != "") description += "<p>Сделано из: " + material + "</p>";
+                if (features != "") description += "<p>Особенности: " + features + "</p>";
+                description += "<p>Мы предлагаем " + category + " ведущих Российских производителей, а также налажена поставка товаров из Китая и Германии. Приобрести данный товар Вы можете on-line на нашем сайте, позвонив по телефону — 8-800-2000-600, а также в офисе в Москве.</p>";
 
                 option.description = description;
 
-                // --------------------------- С„РѕСЂРјРёСЂРѕР°РЅРёРµ РѕРїРёСЃР°РЅРёСЏ ---------------------------
-                char[] se = {'_', '_'};
+                // --------------------------- формироание описания ---------------------------
+                char[] se = { '_', '_' };
                 foreach (string tl in title)
                 {
                     string value = option.get_property(tl.ToLower(), option);
 
-                    if (tl == "WEIGHT_V_GR" && option.WEIGHT_V_GR != "") {
+                    if (tl == "WEIGHT_V_GR" && option.WEIGHT_V_GR != "")
+                    {
                     }
 
-                    // ------------------------------------------- РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РґСѓР±Р»СЏ ------------------------------------------- 
-                    string[] cut_double = {""};
+                    // ------------------------------------------- игнорирование дубля ------------------------------------------- 
+                    string[] cut_double = { "" };
                     if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
                     {
                         //words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
@@ -260,7 +268,7 @@ namespace stl
 
                         sb.Append(cut_double[0] + ";");
                     }
-                    // ------------------------------------------- РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РґСѓР±Р»СЏ -------------------------------------------
+                    // ------------------------------------------- игнорирование дубля -------------------------------------------
                     else if (tl == "LENGTH_PACK" || tl == "WIDTH_PACK" || tl == "HEIGHT_PACK" || tl == "WEIGHT_V" || tl == "WEIGHT")
                     {
                         if (value == "0")
@@ -278,14 +286,14 @@ namespace stl
                     else
                         sb.Append(value + ";");
                 }
-                sb.Remove(sb.Length - 1, 1);        // СѓРґР°Р»РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЂР°Р·РґРµР»РёС‚РµР»СЊРЅРѕРіРѕ СЃРёРјРІРѕР»Р°
+                sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
                 sb.Append("\r\n");
                 //string hi = nameof(option);
             }
 
-            // СЃРѕС…СЂР°РЅСЏРµРј РіРѕРІС‹Р№ С„Р°Р№Р»
-            File.WriteAllText(Path.GetFileNameWithoutExtension(files_xml[0]) + ".csv", sb.ToString(), Encoding.GetEncoding(1251));
-            // --------------------------- РІС‹Р±РѕСЂРєР° РёР· РјР°СЃСЃРёРІР° РєР»Р°СЃСЃРѕРІ СЃРІРѕР№СЃС‚РІ РІ string bufer РґР»СЏ СЃРѕР·СЂР°РЅРµРЅРёСЏ РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р» --------------------------- 
+            // сохраняем говый файл
+            File.WriteAllText(save + "\\" + Path.GetFileNameWithoutExtension(xml) + ".csv", sb.ToString(), Encoding.GetEncoding(1251));
+            // --------------------------- выборка из массива классов свойств в string bufer для созранения в текстовый файл --------------------------- 
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -297,13 +305,13 @@ namespace stl
 
 public partial class settings
 {
-    public List<string[]> options       = new List<string[]>();
-    public List<string> prepositions    = new List<string>          { "A"/*Р»Р°С‚РёРЅРёС†Р°*/, "Рђ" };                                           // СЃРїРёСЃРѕРє РїСЂРµРґР»РѕРіРѕРІ РґР»СЏ РѕР±СЂС‹РІРєРё С„СЂР°Р·С‹
-    public List<string> stop_words      = new List<string>          { "d\\s*=", "h\\s*=", "r\\s*=", "Рђ\\.", "в„–", "SchE",  "С€\\." };     // СЃРїРёСЃРѕРє СЃС‚РѕРї СЃР»РѕРІ РґР»СЏ РѕР±СЂС‹РІРєРё С„СЂР°Р·С‹
-    public List<float[]> coefficients   = new List<float[]>{};                                                                          // СЃРїРёСЃРѕРє РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ
-    List<string[]> categoryes           = new List<string[]>();                                                                         // СЃРїРёСЃРѕРє РєР°С‚РµРіРѕСЂРёР№
-    List<string[]> name_of_categoryes   = new List<string[]>();                                                                         // СЃРїРёСЃРѕРє СЃРѕРѕС‚РЅРѕС€РµРЅРёР№ РёРјРµРЅРё Рё РєРѕРґР° РєР°С‚РµРіРѕСЂРёР№
-                                                                                                                                        // РљРѕСЌС„С„РёС†РёРµРЅС‚С‹ РґР»СЏ РіР°Р±Р°СЂРёС‚РѕРІ Рё РјР°СЃСЃС‹
+    public List<string[]> options = new List<string[]>();
+    public List<string> prepositions = new List<string> { "A"/*латиница*/, "А" };                                                       // список предлогов для обрывки фразы
+    public List<string> stop_words = new List<string> { "d\\s*=", "h\\s*=", "r\\s*=", "А\\.", "№", "SchE", "ш\\." };                    // список стоп слов для обрывки фразы
+    public List<float[]> coefficients = new List<float[]> { };                                                                          // список коэффициентов
+    List<string[]> categoryes = new List<string[]>();                                                                                   // список категорий
+    List<string[]> name_of_categoryes = new List<string[]>();                                                                           // список соотношений имени и кода категорий
+                                                                                                                                        // Коэффициенты для габаритов и массы
     public List<coefficient_of_package>
         coefficients_volume_and_mass = new List<coefficient_of_package>();
     public struct coefficient_of_package
@@ -345,6 +353,16 @@ public partial class settings
         get_stop_words();
     }
 
+    public settings(string file_options, string categoryes, string file_get_name_of_category, string file_coefficients, string file_of_coefficients, string cfg)
+    {
+        add_options(file_options);
+        get_category(categoryes);
+        get_name_of_category(file_get_name_of_category);
+        get_coefficients(file_coefficients);
+        get_coefficients_vol_mass(file_of_coefficients);
+        get_stop_words(cfg);
+    }
+
     private void add_options(string file_name)
     {
         string fileText = System.IO.File.ReadAllText(file_name, Encoding.Default);
@@ -370,10 +388,14 @@ public partial class settings
         }
     }
 
-    // Р·Р°РіСЂСѓР·РєР° СЃР»РѕРІ РґР»СЏ РѕР±СЂРµР·Р°РЅРёСЏ С„СЂР°Р·С‹ Рё РїСЂРµРґР»РѕРіРё
-    private void get_stop_words()
+    // загрузка слов для обрезания фразы и предлоги
+    private void get_stop_words(string cfg = "")
     {
-        string stop_wrd = File.ReadAllText("cfg\\stop words.csv", Encoding.Default);
+        string stop_wrd = "";
+        if (cfg != "")
+            stop_wrd = File.ReadAllText(cfg + "\\stop words.csv", Encoding.Default);
+        else
+            stop_wrd = File.ReadAllText("stop words.csv", Encoding.Default);
         //richTextBox1.Text = stop_wrd;
 
         Regex short_name = new Regex("(.*)\r\n");
@@ -399,7 +421,8 @@ public partial class settings
             if (line[1] != "") stop_words.Add(line[1]);
         }
     }
-    private void get_category(string file_category) {
+    private void get_category(string file_category)
+    {
         string catalogs = File.ReadAllText(file_category, Encoding.Default);
 
         Regex get_line = new Regex("(.*)\r\n");
@@ -420,7 +443,8 @@ public partial class settings
         }
         categoryes.RemoveAt(0);
     }
-    private void get_name_of_category(string file_name_of_category) {
+    private void get_name_of_category(string file_name_of_category)
+    {
         string catalogs = File.ReadAllText(file_name_of_category, Encoding.Default);
 
         Regex get_line = new Regex("(.*)\r\n");
@@ -469,14 +493,14 @@ public partial class settings
             if ((price >= range[0]) && (price <= range[1]))
                 return range[2];
 
-        MessageBox.Show("РљРѕСЌС„С„РёС†РёРµРЅС‚ РЅРµ Р±С‹Р» РЅР°Р№РґРµРЅ");
+        MessageBox.Show("Коэффициент не был найден");
         return 2;
     }
     private void get_coefficients_vol_mass(string file_of_coefficients)
     {
         string cf = null;
-        try     { cf = File.ReadAllText(file_of_coefficients, Encoding.Default); }
-        catch   { MessageBox.Show("РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» СЃ РєРѕСЌС„С„РёС†РёРµРЅС‚Р°РјРё"); }
+        try { cf = File.ReadAllText(file_of_coefficients, Encoding.Default); }
+        catch { MessageBox.Show("Не удалось загрузить файл с коэффициентами"); }
 
         Regex get_line = new Regex("(.*)\r\n");
         MatchCollection words = get_line.Matches(cf);
@@ -501,19 +525,19 @@ public partial class settings
     {
         int category = 9;
         string category_Str = "";
-        // РєР°С‚РµРіРѕСЂРёСЏ РѕР±РЅРѕРІР»РµРЅРЅР°, РѕС‚Р»РёС‡РЅР°СЏ РѕС‚ С„Р°Р№Р»Р° С…РјР», РІР·СЏС‚Р°СЏ РёР· С„Р°РёР»Р° СЃРѕРѕС‚РЅРµСЃРµРЅРёРµ РєР°С‚РµРіРѕСЂРёРё
-        try     { category = Convert.ToInt32(categoryes.Find(cat => Convert.ToInt32(cat[0]) == category_xml)[1]); }
-        catch   { return "{РєР°С‚РµРіРѕСЂРёСЏ РЅРµ РЅР°Р№РґРµРЅР°}"; }
+        // категория обновленна, отличная от файла хмл, взятая из фаила соотнесение категории
+        try { category = Convert.ToInt32(categoryes.Find(cat => Convert.ToInt32(cat[0]) == category_xml)[1]); }
+        catch { return "{категория не найдена}"; }
 
-        // РЅР°Р·РІР°РёРµ РєР°С‚РµРіРѕСЂРёРё РёР· С„Р°РёР»Р° СЃРѕРѕС‚РЅРµСЃРµРЅРёРµ РєР°С‚РµРіРѕСЂРёРё СЃРѕРѕС‚РЅРµСЃРµРЅРЅР°СЏ РїРѕ РЅРѕРјРµСЂСѓ
+        // назваие категории из фаила соотнесение категории соотнесенная по номеру
         try { category_Str = name_of_categoryes.Find(cat => Convert.ToInt32(cat[0]) == category)[1]; }
-        catch   { return "{РєР°С‚РµРіРѕСЂРёСЏ РЅРµ РЅР°Р№РґРµРЅР°}"; }
+        catch { return "{категория не найдена}"; }
         if (category_Str != "")
             return category_Str;
 
-        return "{РєР°С‚РµРіРѕСЂРёСЏ РЅРµ РЅР°Р№РґРµРЅР°}";
+        return "{категория не найдена}";
     }
-    public bool equal (int i, List <int> list)
+    public bool equal(int i, List<int> list)
     {
         foreach (int index in list)
             if (i == index) return true;

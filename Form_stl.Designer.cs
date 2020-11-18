@@ -1,6 +1,6 @@
 ﻿namespace stl
 {
-    partial class Form1
+    partial class Form_stl
     {
         /// <summary>
         /// Обязательная переменная конструктора.
