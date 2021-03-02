@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -12,15 +13,53 @@ using System.Xml.Linq;
 public class Get_xml
 {
     StringReader file_xml_data;
+    string url;
     IEnumerable<Xml_offer> ienum_xml = null;
     public List<Xml_offer> get_xml_data = new List<Xml_offer>();
 
     public Get_xml(string xml, List<int> index)
 	{
-        file_xml_data = new StringReader(File.ReadAllText(xml));
+        //file_xml_data = new StringReader(File.ReadAllText(xml));
+        //xml = File.ReadAllText(xml);
+        try {
+            file_xml_data = new StringReader(File.ReadAllText(xml, Encoding.UTF8));
+
+            int l = new StringBuilder(File.ReadAllText(xml, Encoding.UTF8)).Length;
+            if (l < 900)
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                url = get_url_in_file(xml);
+
+                WebClient wc = new WebClient();
+                wc.Encoding = Encoding.UTF8;
+                try
+                {
+                    file_xml_data = new StringReader(wc.DownloadString(url));
+                }
+                catch
+                {
+                    //richTextBox2.Invoke((MethodInvoker)(() => richTextBox2.Text += "Не удалось загрузить фаил " + url + "\r\n"));
+
+                    return;
+                }
+            }
+        }
+        catch {}
         ienum_xml = offer(file_xml_data, index);
         get_xml_data = ienum_xml.ToList();
         //MessageBox.Show("end");
+    }
+
+    public static string get_url_in_file(string file_name)
+    {
+        string url = null;
+        try { url = File.ReadAllText(file_name); }
+        catch { return null; }
+
+        Regex get_url = new Regex("URL=(.*)\r\n");
+        url = get_url.Match(url).Groups[1].Value;
+
+        return url;
     }
 
     IEnumerable<Xml_offer> offer(StringReader string_xml, List <int> index)
@@ -65,7 +104,7 @@ public class Get_xml
                             offer.price = offer.price_time = Convert.ToSingle(el.Element("price").Value, CultureInfo.InvariantCulture);
                             try { offer.vendor = el.Element("vendor").Value; } catch { offer.vendor = ""; }
                             i = el.Elements("param").Where(e => (string)e.Attribute("name") == "Состав");
-                            offer.composition = (string)i.FirstOrDefault();
+                            try { offer.composition = (string)i.FirstOrDefault(); } catch { offer.composition = ""; }
                             try { offer.category = Convert.ToInt32(el.Element("categoryId").Value); } catch { offer.category = 9999999; MessageBox.Show("нет категории"); }
 
 

@@ -558,8 +558,8 @@ public class Options
     public string RAZMER_M { get { return razmer_m; } set { razmer_m = value; } }
     public string size_mm;
     public string SIZE_MM { get { return size_mm; } set { size_mm = value; } }
-    //public string size;
-    //public string SIZE { get { return ; } set {  = value; } }
+    public string size_sm;
+    public string SIZE_SM { get { return size_sm; } set { size_sm = value; } }
     public string razmeshchenie;
     public string RAZMESHCHENIE { get { return razmeshchenie; } set { razmeshchenie = value; } }
     public string rasstoyanie_mezhdu_iglami_mm;
@@ -798,8 +798,10 @@ public class Options
     public string INDIVI_UPA { get { return indivi_upa; } set { indivi_upa = value; } }
     public string size_upa;
     public string SIZE_UPA { get { return size_upa; } set { size_upa = value; } }
-    public string size;
-    public string SIZE { get { return size; } set { size = value; } }
+    public string size_orig;
+    public string SIZE_ORIG { get { return size_orig; } set { size_orig = value; } }
+    public string size_2;
+    public string SIZE_2 { get { return size_2; } set { size_2 = value; } }
     public string ves_brutto;
     public string VES_BRUTTO { get { return ves_brutto; } set { ves_brutto = value; } }
     public string ves_netto_g;
@@ -838,29 +840,50 @@ public class Options
         catch   { return ""; }
     }
 
-    public void get_abc_weight(List<settings.coefficient_of_package> cop, ref List<Xml_offer> xml)
+    public void get_abc_weight(List<cfg_data.coefficient_of_package> cop, ref List<Xml_offer> xml)
     {
         try
         {
+            Regex getline = new Regex("(.*)$");
+            string size_upa_lite = "";
+            char[] se = { '_', '_' };
+
+            if (size_upa != null && size_upa != "")
+            {
+                size_upa_lite = size_upa;
+            }
+            else if (size_2 != null && size_2 != "")
+            {
+                size_upa_lite = size_2;
+            }
+
+            size_upa_lite = size_upa_lite.Split(se)[0];
+
             Regex upa = new Regex(@"(\d*,?\d*)\s*см\s*.\s*(\d*,?\d*)\s*см\s*.\s*(\d*,?\d*)");
-            Match m_abc = upa.Match(size_upa);
+            Match m_abc = upa.Match(size_upa_lite);
 
             a = Convert.ToSingle(m_abc.Groups[1].Value);
             b = Convert.ToSingle(m_abc.Groups[2].Value);
             c = Convert.ToSingle(m_abc.Groups[3].Value);
         }
-        catch { }
+        catch {}
 
         try
         {
             Regex r_weight = new Regex(@"(\d*)");
             weight_orig = Convert.ToSingle(r_weight.Match(ves_brutto).Value);
         }
-        catch { }
+        catch {}
 
         //  коррректировка
         bool no_c = true;
-        string categoryId = xml.Find(l => l.id == artnumber).category.ToString();   // категория из xml
+        string categoryId;
+        try
+        {
+            categoryId = xml.Find(l => l.id == artnumber).category.ToString();   // категория из xml
+        }
+        catch { categoryId = "999999"; }
+
         const float coefficient = 1.3f;
         //CultureInfo culture = new CultureInfo("en-US");
         foreach (var item in cop)

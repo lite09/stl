@@ -60,7 +60,6 @@
             this.таблицаСвойствToolStripMenuItem.Name = "таблицаСвойствToolStripMenuItem";
             this.таблицаСвойствToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.таблицаСвойствToolStripMenuItem.Text = "таблица свойств";
-            this.таблицаСвойствToolStripMenuItem.Click += new System.EventHandler(this.таблицаСвойствToolStripMenuItem_Click);
             // 
             // openFileDialog
             // 
@@ -75,9 +74,8 @@
             this.button1.TabIndex = 1;
             this.button1.Text = "доп фаил";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // Form1
+            // Form_stl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -85,8 +83,8 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Name = "Form_stl";
+            this.Load += new System.EventHandler(this.Form_stl_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

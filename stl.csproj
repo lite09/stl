@@ -55,14 +55,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="classes\functions_stl.cs" />
     <Compile Include="Form_stl.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form_stl.Designer.cs">
       <DependentUpon>Form_stl.cs</DependentUpon>
     </Compile>
-    <Compile Include="get_xml.cs" />
-    <Compile Include="options.cs" />
+    <Compile Include="classes\get_xml.cs" />
+    <Compile Include="classes\options.cs" />
+    <Compile Include="classes\options_stl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form_stl.resx">
