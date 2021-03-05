@@ -28,6 +28,8 @@ namespace stl
             string cfg_folder = Convert.ToString(inf[4]);
             string tmpl_description = Convert.ToString(inf[5]);
 
+            const uint shift = 2;
+
             settings sets = new settings(/*xml, */folder_options, save, cfg, cfg_folder);
             List<Options> options = new List<Options>();                        // опции всех файлов
             List<int> index = new List<int>();                                  // список индексов из данных парсера
@@ -38,9 +40,11 @@ namespace stl
 
             string name_f = "";
             string save_uload = "";
+
             List<string> title_tmp = new List<string>();
             List<string> title = new List<string>();
             List<string> unload = new List<string>();
+
             Regex get_line = new Regex("(.+)$", RegexOptions.Multiline);
             string words = "";
             StringBuilder sb = new StringBuilder();
@@ -54,7 +58,6 @@ namespace stl
 
                 // -------------------------------------------- Заголовок --------------------------------------------
                 Regex sub_string = new Regex(";");
-
                 words = get_line.Match(fileText).Groups[1].Value;
 
                 string[] title_l = sub_string.Split(words);
@@ -63,16 +66,20 @@ namespace stl
                 for (int il = 0; il < title_l.Length; il++)
                 {
                     bool fine = false;
+                    if (il == shift)
+                    {
+                        /*title.Add("PROIZVODITEL"); */
+                        title_tmp.Add("NAME"); title_tmp.Add("FULL_NAME"); title_tmp.Add("EKSPORT");
+                        title_tmp.Add("DESCRIPTION"); title_tmp.Add("LENGTH_PACK"); title_tmp.Add("WIDTH_PACK"); title_tmp.Add("HEIGHT_PACK"); title_tmp.Add("WEIGHT_V"); title_tmp.Add("WEIGHT");
+                        title_tmp.Add("DELIVERY_PACKAGE_TYPE"); title_tmp.Add("DELIVERY_PACKAGE");
+                    }
+
                     foreach (string[] it in sets.cfg.options)
-                        if (title_l[il] == "\"" + it[0] + "\"")
+                        if ((title_l[il] == "\"" + it[0] + "\"") || (title_l[il] == it[0]))
                         {
                             fine = true;
                             title_tmp.Add(it[1]);   // заголовок из наденных свойств
-                        }
-                        else if(title_l[il] == it[0])
-                        {
-                            fine = true;
-                            title_tmp.Add(it[1]);   // заголовок из наденных свойств
+                            break;
                         }
 
                     if (!fine)
@@ -82,10 +89,7 @@ namespace stl
                     }
                 }
 
-                foreach (string s in unload)
-                {
-                    save_uload += s + "\r\n";
-                }
+                foreach (string s in unload) save_uload += s + "\r\n";
 
                 int i = 0;
                 foreach (string option in title_tmp)
@@ -101,16 +105,18 @@ namespace stl
                     }
                     if (!is_tl)
                         title.Add(option);
-                    if (i == 5)
+                    if (i == shift)
                     {
-                        /*title.Add("PROIZVODITEL"); */title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
+                        /*title.Add("PROIZVODITEL"); */
+                        title.Add("NAME"); title.Add("FULL_NAME"); title.Add("EKSPORT");
+                        title.Add("DESCRIPTION"); title.Add("LENGTH_PACK"); title.Add("WIDTH_PACK"); title.Add("HEIGHT_PACK"); title.Add("WEIGHT_V"); title.Add("WEIGHT");
                         title.Add("DELIVERY_PACKAGE_TYPE"); title.Add("DELIVERY_PACKAGE");
                     }
                 }
                 // -------------------------------------------- Заголовок --------------------------------------------
 
                 title = title.Distinct().ToList();
-                foreach (string item in title)
+                foreach (string item in title_tmp)
                     normal_file.Append(item + ";");
                 normal_file.Append("\r\n");  // файл с правильным заголовком
 
@@ -146,7 +152,7 @@ namespace stl
                     buf = "";
                     for (i = 0; i < cells.Length; i++)
                     {
-                        if (i == 5) buf += ";;;;;;;;;";
+                        if (i == shift) buf += ";;;;;;;;;;;";
                         if (sets.equal(i, not_found_index))     // - пропуск не наиденных столбцов
                             continue;
                         buf += cells[i] + ";";
@@ -166,6 +172,8 @@ namespace stl
                     //MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
                 }
 
+                //File.WriteAllText("normal_file.csv", normal_file.ToString(), Encoding.Default);
+                //MessageBox.Show("hi");
                 List<Options> options_values = new List<Options>();
                 StreamReader reader = new StreamReader(new MemoryStream(Encoding.GetEncoding(1251).GetBytes(normal_file.ToString())), Encoding.GetEncoding(1251));
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
@@ -187,8 +195,18 @@ namespace stl
             }
 
             foreach (var tl in title) sb.Append(tl + ";");
-            sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
+            sb.Remove(sb.Length - 1, 1);        //  удаление последнего разделительного символа
             sb.Append("\r\n");
+
+            //                                  //  удаление кавычек
+            foreach (Options option in options)
+            {
+                if (option.id == "2624611")
+                {
+                    //
+                }
+            }
+            foreach (Options option in options) option.id = Regex.Replace(option.id, "\"", "");
 
             // --------------------------- добавление в список индексов ---------------------------
             Regex r_id = new Regex("(.*)\\/(\\d*)");
