@@ -1,4 +1,5 @@
 using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -174,19 +175,22 @@ namespace stl
 
                 //File.WriteAllText("normal_file.csv", normal_file.ToString(), Encoding.Default);
                 //MessageBox.Show("hi");
+
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = ";",
+                    HeaderValidated = null,
+                    MissingFieldFound = null,
+                    Encoding = Encoding.GetEncoding(1251),
+                    //var info = new List<string>();
+                    BadDataFound = data => {
+                        //info.Add(data.RawRecord);
+                    },
+                };
                 List<Options> options_values = new List<Options>();
                 StreamReader reader = new StreamReader(new MemoryStream(Encoding.GetEncoding(1251).GetBytes(normal_file.ToString())), Encoding.GetEncoding(1251));
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                using (var csv = new CsvReader(reader, config))
                 {
-                    csv.Configuration.Delimiter = ";";
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.MissingFieldFound = null;
-                    csv.Configuration.Encoding = Encoding.GetEncoding(1251);
-                    var info = new List<string>();
-                    csv.Configuration.BadDataFound = data => {
-                        info.Add(data.RawRecord);
-                    };
-
                     var li = csv.GetRecords<Options>();
                     options_values = li.ToList();
                     options.AddRange(options_values);
@@ -318,19 +322,20 @@ namespace stl
             if (file_last_option != null)
             {
                 // ---------------------------------------------------- загрузка нового фаила с описанием -----------------------------------------------------
-                using (var reader = new StringReader(sb.ToString()))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    csv.Configuration.Delimiter = ";";
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.MissingFieldFound = null;
-                    csv.Configuration.Encoding = Encoding.GetEncoding(1251);
-                    var info = new List<string>();
-                    csv.Configuration.BadDataFound = data =>
-                    {
-                        info.Add(data.RawRecord);
-                    };
-
+                    Delimiter = ";",
+                    HeaderValidated = null,
+                    MissingFieldFound = null,
+                    Encoding = Encoding.GetEncoding(1251),
+                    //var info = new List<string>();
+                    BadDataFound = data => {
+                        //info.Add(data.RawRecord);
+                    },
+                };
+                using (var reader = new StringReader(sb.ToString()))
+                using (var csv = new CsvReader(reader, config))
+                {
                     var li = csv.GetRecords<Options_stl>();
                     options_new = li.ToList();
                 }
@@ -338,18 +343,8 @@ namespace stl
 
                 // -------------------------------------------------- загрузка предидущего фаила с описанием --------------------------------------------------
                 using (var reader = new StreamReader(file_last_option, Encoding.GetEncoding(1251)))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                using (var csv = new CsvReader(reader, config))
                 {
-                    csv.Configuration.Delimiter = ";";
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.MissingFieldFound = null;
-                    csv.Configuration.Encoding = Encoding.GetEncoding(1251);
-                    var info = new List<string>();
-                    csv.Configuration.BadDataFound = data =>
-                    {
-                        info.Add(data.RawRecord);
-                    };
-
                     var li = csv.GetRecords<Options_stl>();
                     options_last = li.ToList();
                 }
