@@ -249,26 +249,77 @@ namespace stl
 
                 char[] se = { '_', '_' };
                 // --------------------------- формироание описания ---------------------------
-                string name = time_xml_line.name;
-                string short_name = time_xml_line.name_short(time_xml_line.name, sets.cfg.prepositions, sets.cfg.stop_words);
-                string proisvoditel = option.proizvoditel;
-                string strana_prois = option.strana_proizvoditel;
-                string price = Convert.ToString(time_xml_line.price * sets.get_coefficient(time_xml_line.price));
-                string artnum = option.artnumber;
-                //string material = option.material != "" ? option.material : time_xml_line.composition;
-                string val = option.get_property("sostav", option);
-                if (val != "")
-                    option.sostav = val.Split(se)[0];
+                Dictionary<string, string> words_key = new Dictionary<string, string>();
+                words_key.Add("full_name", time_xml_line.name);
+                words_key.Add("name", time_xml_line.name_short(time_xml_line.name, sets.cfg.prepositions, sets.cfg.stop_words));
+                words_key.Add("proizvoditel", option.proizvoditel);
+                words_key.Add("strana_proizvoditel", option.strana_proizvoditel);
+                words_key.Add("price", Convert.ToString(time_xml_line.price * sets.get_coefficient(time_xml_line.price)));
+                words_key.Add("artnumber", option.artnumber);
+
+                if (option.sostav != "" && option.sostav != null)
+                    option.sostav = option.sostav.Split(se)[0];
+                words_key.Add("sostav", option.sostav);
+
                 string material = option.material != "" ? option.material : option.sostav;
-                if (material == "")
-                    material = time_xml_line.composition;
-                string category = sets.get_name_of_category(time_xml_line.category);
-                string product_color = option.product_color;
-                string osob_cveta = option.osobennosti_cveta;
+                if (material == "") material = time_xml_line.composition;
+                words_key.Add("material", material);
 
-                object[] info = { name, short_name, proisvoditel, strana_prois, price, artnum, material, category, product_color, osob_cveta };
+                words_key.Add("id_category", sets.get_name_of_category(time_xml_line.category));
+                words_key.Add("product_color", option.product_color);
+                words_key.Add("osobennosti_cveta", option.osobennosti_cveta);
 
-                option.description = classes.functions_stl.make_description(tmpl_description, info);
+                if (option.seriya != "" && option.seriya != null)
+                    option.seriya = option.seriya.Split(se)[0];
+                words_key.Add("seriya", option.seriya);
+
+                words_key.Add("osobennost_nozhnic", option.osobennost_nozhnic);
+                words_key.Add("vid_kryuchka", option.vid_kryuchka);
+                words_key.Add("material_kryuchka", option.material_kryuchka);
+                words_key.Add("vid_spic", option.vid_spic);
+                words_key.Add("osobennost_igly", option.osobennost_igly);
+                words_key.Add("naznachenie", option.naznachenie);
+                words_key.Add("vid_shtornoj_furnitury", option.vid_shtornoj_furnitury);
+                words_key.Add("vid_pugovicy", option.vid_pugovicy);
+                words_key.Add("material_kanvy", option.material_kanvy);
+                words_key.Add("cvet_zvenev", option.cvet_zvenev);
+                words_key.Add("vid_naklejki", option.vid_naklejki);
+                words_key.Add("tkan", option.tkan);
+                words_key.Add("vid_zagotovki", option.vid_zagotovki);
+                words_key.Add("vid_bulavki", option.vid_bulavki);
+                words_key.Add("vid_podhvata_dlya_shtor", option.vid_podhvata_dlya_shtor);
+                words_key.Add("osobennosti_shkatulki", option.osobennosti_shkatulki);
+                words_key.Add("vid_ruchki", option.vid_ruchki);
+                words_key.Add("cvet_sterzhnya", option.cvet_sterzhnya);
+                words_key.Add("vid_kleya", option.vid_kleya);
+                words_key.Add("osnova_kleya", option.osnova_kleya);
+                words_key.Add("naznachenie_kleya", option.naznachenie_kleya);
+                words_key.Add("effekt", option.effekt);
+                words_key.Add("tverdost", option.tverdost);
+                words_key.Add("sostavlyayushchie_nabora", option.sostavlyayushchie_nabora);
+                words_key.Add("komplektaciya", option.komplektaciya);
+                words_key.Add("vid_etyudnika_molberta", option.vid_etyudnika_molberta);
+                words_key.Add("material_dlya_applikacii", option.material_dlya_applikacii);
+                words_key.Add("vid_kisti", option.vid_kisti);
+                words_key.Add("forma_kisti", option.forma_kisti);
+                words_key.Add("material_vorsa_kisti", option.material_vorsa_kisti);
+                words_key.Add("tip_gipsovoj_figury", option.tip_gipsovoj_figury);
+                words_key.Add("osobennosti_gravyury", option.osobennosti_gravyury);
+                words_key.Add("vid_peska", option.vid_peska);
+                words_key.Add("vid_dekora", option.vid_dekora);
+                words_key.Add("cvet_volos", option.cvet_volos);
+                words_key.Add("forma_volos", option.forma_volos);
+                words_key.Add("vid_spreya", option.vid_spreya);
+                words_key.Add("vid_cvetov", option.vid_cvetov);
+                words_key.Add("vid_straz", option.vid_straz);
+                words_key.Add("vid_dyrokola", option.vid_dyrokola);
+                words_key.Add("vid_miniatyury", option.vid_miniatyury);
+                words_key.Add("vid_banta", option.vid_banta);
+                words_key.Add("vid_opytov", option.vid_opytov);
+                //  ----------  new  ----------
+                //  ----------  new  ----------
+
+                option.description = classes.functions_stl.make_description(tmpl_description, words_key);
 
                 // --------------------------- формироание описания ---------------------------
                 foreach (string tl in title)
@@ -307,6 +358,7 @@ namespace stl
                     else
                         sb.Append(value + ";");
                 }
+
                 sb.Remove(sb.Length - 1, 1);        // удаление последнего разделительного символа
                 sb.Append("\r\n");
                 //string hi = nameof(option);
