@@ -1,48 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace stl.classes
 {
     class functions_stl
     {
-        public static string make_description(string source_description, Dictionary<string, string> key_words)
+        public static string make_description(List<string> source_description, Dictionary<string, string> key_words)
         {
-            if (source_description == null || source_description == "")
+            if (source_description == null || source_description.Count == 0)
                 return null;
 
-            Regex getline = new Regex(@"(<.[^/]*/\S[^<]+>*)");
-            List<string> lines_description = new List<string>();
+            //  удаление строк без наиденных данных
+            //string []time_d = new string[source_description.Count]; time_d = source_description.ToArray();
+            
+            List<string> time_description = source_description.ToList();
 
-            MatchCollection lines = Regex.Matches(source_description.Replace("\r\n", ""), getline.ToString(), RegexOptions.Multiline);
-            lines_description = lines.Cast<Match>().Select(m => m.Value).ToList();
+            time_description.RemoveAll(i => {
+                foreach (var key in key_words) if (Regex.IsMatch(i, "{" + key.Key + "}"))
+                        return false;
 
-            foreach (var k_word in key_words)
-            {
-                if (k_word.Value == "" || k_word.Value == null)
-                {
-                    lines_description.RemoveAll(i => Regex.IsMatch(i.ToLower(), k_word.Key));
-                    continue;
-                }
-            }
+                return true;
+            });
 
             //  обновление кодовых слов значениями
             foreach (var k_word in key_words)
-                for (int l = 0; l < lines_description.Count; l++)
-                    lines_description[l] = lines_description[l].Replace("{" + k_word.Key.ToUpper() + "}", k_word.Value);
+                for (int l = 0; l < time_description.Count; l++)
+                    time_description[l] = time_description[l].Replace("{" + k_word.Key.ToUpper() + "}", k_word.Value);
 
-            string description = string.Join("", lines_description.ToArray());
-
-
-
-            /*if (product_color == "")
-                lines_description.RemoveAll(i => Regex.IsMatch(i, words[3]));
-
-            description = osob_cveta != ""?description.Replace("{OSOBENNOSTI_CVETA}", @"<br>&nbsp" + osob_cveta):description.Replace("{OSOBENNOSTI_CVETA}", osob_cveta);
-            description = description.Replace("{ID_CATEGORY}", category);*/
+            string description = string.Join("", time_description.ToArray());
 
             return description;
+        }
+
+        static public string get_property(string property, Options op)
+        {
+            if (property == "height_pack")
+            {
+            }
+            try
+            {
+                FieldInfo i = typeof(Options).GetField(property.ToLower());
+                if (i == null)
+                    return "";
+
+                object value = i.GetValue(op);//.ToString();
+                if (value == null)
+                    return "";
+
+                string s = value.ToString();
+                s = s.ToString(CultureInfo.InvariantCulture);
+                //return value.ToString();
+                return s;
+            }
+            catch { return ""; }
         }
     }
 }

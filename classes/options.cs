@@ -817,29 +817,6 @@ public class Options
     public string price_for_;
     public string PRICE_FOR_{ get { return price_for_; } set { price_for_ = value; } }
 
-
-    public string get_property(string property, Options op)
-    {
-        if (property == "height_pack")
-        {
-        }
-        try     {
-            FieldInfo i = typeof(Options).GetField(property.ToLower());
-            if (i == null)
-                return "";
-
-            object value = i.GetValue(op);//.ToString();
-            if (value == null)
-                return "";
-
-            string s = value.ToString();
-            s = s.ToString(CultureInfo.InvariantCulture);
-            //return value.ToString();
-            return s;
-        }
-        catch   { return ""; }
-    }
-
     public void get_abc_weight(List<cfg_data.coefficient_of_package> cop, ref List<Xml_offer> xml)
     {
         try

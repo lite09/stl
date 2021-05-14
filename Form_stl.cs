@@ -1,5 +1,6 @@
 using CsvHelper;
 using CsvHelper.Configuration;
+using stl.classes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -27,7 +28,8 @@ namespace stl
             string save = Convert.ToString(inf[2]);
             cfg_data cfg = (cfg_data)inf[3];
             string cfg_folder = Convert.ToString(inf[4]);
-            string tmpl_description = Convert.ToString(inf[5]);
+            List<string> tmpl_description = (List<string>)inf[5];
+            string []key_words = (string[])inf[6];
 
             const uint shift = 2;
 
@@ -55,7 +57,9 @@ namespace stl
                 StringBuilder normal_file = new StringBuilder();
                 title_tmp.Clear();
                 name_f = Path.GetFileNameWithoutExtension(file_option);
-                string fileText = System.IO.File.ReadAllText(file_option, Encoding.Default);
+                string fileText = "";
+                try { fileText = System.IO.File.ReadAllText(file_option, Encoding.Default); }
+                catch { MessageBox.Show("Не найден фаил описания"); }
 
                 // -------------------------------------------- Заголовок --------------------------------------------
                 Regex sub_string = new Regex(";");
@@ -250,81 +254,41 @@ namespace stl
                 char[] se = { '_', '_' };
                 // --------------------------- формироание описания ---------------------------
                 Dictionary<string, string> words_key = new Dictionary<string, string>();
-                words_key.Add("full_name", time_xml_line.name);
-                words_key.Add("name", time_xml_line.name_short(time_xml_line.name, sets.cfg.prepositions, sets.cfg.stop_words));
-                words_key.Add("proizvoditel", option.proizvoditel);
-                words_key.Add("strana_proizvoditel", option.strana_proizvoditel);
-                words_key.Add("price", Convert.ToString(time_xml_line.price * sets.get_coefficient(time_xml_line.price)));
-                words_key.Add("artnumber", option.artnumber);
 
-                if (option.sostav != "" && option.sostav != null)
-                    option.sostav = option.sostav.Split(se)[0];
-                words_key.Add("sostav", option.sostav);
+                if (key_words == null) key_words = new string[0];
+                foreach (var key in key_words)
+                    if (functions_stl.get_property(key, option) != "" && functions_stl.get_property(key, option) != null)
+                        words_key.Add(key, functions_stl.get_property(key, option));
 
-                string material = option.material != "" ? option.material : option.sostav;
-                if (material == "") material = time_xml_line.composition;
-                words_key.Add("material", material);
+                if (words_key.ContainsKey("SOSTAV"))
+                    words_key["SOSTAV"] = words_key["SOSTAV"].Split(se)[0];
 
-                words_key.Add("id_category", sets.get_name_of_category(time_xml_line.category));
-                words_key.Add("product_color", option.product_color);
-                words_key.Add("osobennosti_cveta", option.osobennosti_cveta);
+                if (words_key.ContainsKey("SERIYA"))
+                    words_key["SERIYA"] = words_key["SERIYA"].Split(se)[0];
 
-                if (option.seriya != "" && option.seriya != null)
-                    option.seriya = option.seriya.Split(se)[0];
-                words_key.Add("seriya", option.seriya);
+                if (words_key.ContainsKey("MATERIAL"))
+                {
+                    string material = option.material != "" ? option.material : option.sostav;
+                    if (material == "") material = time_xml_line.composition;
+                    words_key["MATERIAL"] = material;
+                }
 
-                words_key.Add("osobennost_nozhnic", option.osobennost_nozhnic);
-                words_key.Add("vid_kryuchka", option.vid_kryuchka);
-                words_key.Add("material_kryuchka", option.material_kryuchka);
-                words_key.Add("vid_spic", option.vid_spic);
-                words_key.Add("osobennost_igly", option.osobennost_igly);
-                words_key.Add("naznachenie", option.naznachenie);
-                words_key.Add("vid_shtornoj_furnitury", option.vid_shtornoj_furnitury);
-                words_key.Add("vid_pugovicy", option.vid_pugovicy);
-                words_key.Add("material_kanvy", option.material_kanvy);
-                words_key.Add("cvet_zvenev", option.cvet_zvenev);
-                words_key.Add("vid_naklejki", option.vid_naklejki);
-                words_key.Add("tkan", option.tkan);
-                words_key.Add("vid_zagotovki", option.vid_zagotovki);
-                words_key.Add("vid_bulavki", option.vid_bulavki);
-                words_key.Add("vid_podhvata_dlya_shtor", option.vid_podhvata_dlya_shtor);
-                words_key.Add("osobennosti_shkatulki", option.osobennosti_shkatulki);
-                words_key.Add("vid_ruchki", option.vid_ruchki);
-                words_key.Add("cvet_sterzhnya", option.cvet_sterzhnya);
-                words_key.Add("vid_kleya", option.vid_kleya);
-                words_key.Add("osnova_kleya", option.osnova_kleya);
-                words_key.Add("naznachenie_kleya", option.naznachenie_kleya);
-                words_key.Add("effekt", option.effekt);
-                words_key.Add("tverdost", option.tverdost);
-                words_key.Add("sostavlyayushchie_nabora", option.sostavlyayushchie_nabora);
-                words_key.Add("komplektaciya", option.komplektaciya);
-                words_key.Add("vid_etyudnika_molberta", option.vid_etyudnika_molberta);
-                words_key.Add("material_dlya_applikacii", option.material_dlya_applikacii);
-                words_key.Add("vid_kisti", option.vid_kisti);
-                words_key.Add("forma_kisti", option.forma_kisti);
-                words_key.Add("material_vorsa_kisti", option.material_vorsa_kisti);
-                words_key.Add("tip_gipsovoj_figury", option.tip_gipsovoj_figury);
-                words_key.Add("osobennosti_gravyury", option.osobennosti_gravyury);
-                words_key.Add("vid_peska", option.vid_peska);
-                words_key.Add("vid_dekora", option.vid_dekora);
-                words_key.Add("cvet_volos", option.cvet_volos);
-                words_key.Add("forma_volos", option.forma_volos);
-                words_key.Add("vid_spreya", option.vid_spreya);
-                words_key.Add("vid_cvetov", option.vid_cvetov);
-                words_key.Add("vid_straz", option.vid_straz);
-                words_key.Add("vid_dyrokola", option.vid_dyrokola);
-                words_key.Add("vid_miniatyury", option.vid_miniatyury);
-                words_key.Add("vid_banta", option.vid_banta);
-                words_key.Add("vid_opytov", option.vid_opytov);
-                //  ----------  new  ----------
-                //  ----------  new  ----------
+                if (key_words.Contains("NAME"))
+                    words_key["NAME"] = time_xml_line.name_short(time_xml_line.name, sets.cfg.prepositions, sets.cfg.stop_words);
+                if (key_words.Contains("FULL_NAME"))
+                    words_key["FULL_NAME"] = time_xml_line.name;
+                if (key_words.Contains("PRICE"))
+                    words_key["PRICE"] = Convert.ToString(time_xml_line.price * sets.get_coefficient(time_xml_line.price));
+                if (key_words.Contains("ID_CATEGORY"))
+                    words_key["ID_CATEGORY"] = sets.get_name_of_category(time_xml_line.category);
+
 
                 option.description = classes.functions_stl.make_description(tmpl_description, words_key);
 
                 // --------------------------- формироание описания ---------------------------
                 foreach (string tl in title)
                 {
-                    string value = option.get_property(tl.ToLower(), option);
+                    string value = functions_stl.get_property(tl.ToLower(), option);
 
                     if (tl == "WEIGHT_V_GR" && option.WEIGHT_V_GR != "")
                     {
@@ -332,7 +296,7 @@ namespace stl
 
                     // ------------------------------------------- игнорирование дубля ------------------------------------------- 
                     string[] cut_double = { "" };
-                    if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV")
+                    if (tl == "SERIYA" || tl == "PRICE_FOR_THE_ONE" || tl == "PRICE_FOR" || tl == "PRICE_FOR_" || tl == "SOSTAV" || tl == "SIZE_2")
                      {
                         //words = get_line.Match(option.get_property(tl.ToLower(), option)).Groups[1].Value;
                         if (value != "")
@@ -405,7 +369,7 @@ namespace stl
                 new_artnumbers = Options_stl.get_artbumbers(options_new);
                 last_artnumbers = Options_stl.get_artbumbers(options_last);
                 new_id = new_artnumbers.Except(last_artnumbers).ToArray();              //  нахождение новых позиции
-                equal  = new_artnumbers.Intersect(last_artnumbers).ToArray();           //  нахождение совпадении
+                //equal  = new_artnumbers.Intersect(last_artnumbers).ToArray();           //  нахождение совпадении
 
                 //  добавление новых элементов
                 Options_stl new_op = new Options_stl();
@@ -487,7 +451,9 @@ public partial class settings
 
     private void get_category(string file_category)
     {
-        string catalogs = File.ReadAllText(file_category, Encoding.Default);
+        string catalogs = "";
+        try     { catalogs = File.ReadAllText(file_category, Encoding.Default); }
+        catch   { MessageBox.Show("Не найден фаил \"Соотнесение категорий\""); }
 
         Regex get_line = new Regex("(.*)\r\n");
         MatchCollection words = get_line.Matches(catalogs);
@@ -509,7 +475,9 @@ public partial class settings
     }
     private void get_name_of_category(string file_name_of_category)
     {
-        string catalogs = File.ReadAllText(file_name_of_category, Encoding.Default);
+        string catalogs = "";
+        try { catalogs = File.ReadAllText(file_name_of_category, Encoding.Default); }
+        catch { MessageBox.Show("Не найден фаил \"id категорий\""); }
 
         Regex get_line = new Regex("(.*)\r\n");
         MatchCollection words = get_line.Matches(catalogs);
@@ -536,7 +504,7 @@ public partial class settings
             if ((price >= range[0]) && (price <= range[1]))
                 return range[2];
 
-        MessageBox.Show("Коэффициент не был найден");
+        MessageBox.Show("Коэффициент не был найден\nЦена товара: " + price);
         return 2;
     }
 
