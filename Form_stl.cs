@@ -171,11 +171,11 @@ namespace stl
 
                 MatchCollection time = get_line.Matches(normal_file.ToString());
 
-                if (save_uload != "")
+                /*if (save_uload != "")
                 {
                     File.WriteAllText("unload.txt", save_uload);
                     //MessageBox.Show("Не все поля заголовка были найденны.\r\nНедостающие свойства сохнаненны в файл unload.txt");
-                }
+                }*/
 
                 //File.WriteAllText("normal_file.csv", normal_file.ToString(), Encoding.Default);
                 //MessageBox.Show("hi");
