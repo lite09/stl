@@ -22,6 +22,10 @@ namespace stl
 
         public void make_op(object ob)
         {
+            string[,] sim_to_ch = null; ;
+            try { sim_to_ch = functions_stl.get_sim_to_ch("cfg\\Список подстановки.txt"); }
+            catch { MessageBox.Show("Не удалось загрузить Список подстановки.txt"); }
+
             object[] inf = ob as object[];
             string xml = Convert.ToString(inf[0]);
             string folder_options = Convert.ToString(inf[1]);
@@ -245,6 +249,8 @@ namespace stl
             foreach (Options option in options)
             {
                 Xml_offer time_xml_line = xml_data.get_xml_data.Find(data => data.id == option.artnumber);
+                time_xml_line.to_asci(sim_to_ch);
+
                 if (time_xml_line != null)
                 {
                     option.proizvoditel = time_xml_line.vendor;
@@ -408,11 +414,6 @@ namespace stl
             // удаление файлов парсера
             foreach (string file_option in files_opions)
                 File.Delete(file_option);
-        }
-
-        private void Form_stl_Load(object sender, EventArgs e)
-        {
-            //
         }
     }
 }

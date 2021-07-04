@@ -191,4 +191,23 @@ public class Xml_offer
 
         return name;
     }
+
+    private static string utf_to_asci(string s, string[,] temls)
+    {
+        for (int i = 0; i < temls.Length / 2; i++)
+            if(s!= null)
+                s = s.Replace(temls[i, 0], temls[i, 1]);
+
+        return s;
+    }
+
+    // Перевод строковых значений с UTF в ASCI формат
+    public void to_asci(string[,] temls)
+    {
+        name = utf_to_asci(name, temls);
+        short_name = utf_to_asci(short_name, temls);
+        vendor = utf_to_asci(vendor, temls);
+        sales_notes = utf_to_asci(sales_notes, temls);
+        composition = utf_to_asci(composition, temls);
+    }
 }
